@@ -1,0 +1,1526 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Argentina: A Wine Master's Challenge</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+        .modal-content {
+            max-height: 80vh;
+        }
+        .prose-purple a {
+            color: #9333ea;
+        }
+        .prose-purple a:hover {
+            color: #7e22ce;
+        }
+        .timeline-item.selected {
+            background-color: #6b21a8;
+            color: white;
+        }
+        .flashcard-container {
+            perspective: 1000px;
+        }
+        .flashcard {
+            width: 100%;
+            height: 100%;
+            position: relative;
+            transform-style: preserve-3d;
+            transition: transform 0.6s;
+        }
+        .flashcard.is-flipped {
+            transform: rotateY(180deg);
+        }
+        .flashcard-face {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            backface-visibility: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 2rem;
+            border-radius: 0.5rem;
+        }
+        .flashcard-front {
+            background-color: #374151; /* gray-700 */
+        }
+        .flashcard-back {
+            background-color: #4b5563; /* gray-600 */
+            transform: rotateY(180deg);
+        }
+    </style>
+</head>
+<body class="bg-gray-900 text-white">
+
+
+
+
+    <div id="main-menu" class="min-h-screen flex flex-col items-center justify-center p-4">
+        <h1 class="text-4xl md:text-5xl font-bold text-purple-400 mb-2 text-center">Argentina</h1>
+        <h2 class="text-2xl md:text-3xl font-semibold mb-8 text-center">A Wine Master's Challenge</h2>
+
+
+
+
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 w-full max-w-4xl mb-8">
+            <button data-module="historian" class="module-btn bg-gray-800 p-6 rounded-lg hover:bg-purple-700 transition-colors duration-300">
+                <h3 class="text-xl font-bold mb-2">The Historian's Scroll</h3>
+                <p class="text-gray-400">Order the key events that shaped Argentina.</p>
+            </button>
+            <button data-module="terroir" class="module-btn bg-gray-800 p-6 rounded-lg hover:bg-purple-700 transition-colors duration-300">
+                <h3 class="text-xl font-bold mb-2">The Terroir Architect</h3>
+                <p class="text-gray-400">Master the soils, climate, and geography.</p>
+            </button>
+            <button data-module="ampelographer" class="module-btn bg-gray-800 p-6 rounded-lg hover:bg-purple-700 transition-colors duration-300">
+                <h3 class="text-xl font-bold mb-2">The Ampelographer's Challenge</h3>
+                <p class="text-gray-400">Identify the region's key grape varieties and viticulture.</p>
+            </button>
+            <button data-module="lawmaker" class="module-btn bg-gray-800 p-6 rounded-lg hover:bg-purple-700 transition-colors duration-300">
+                <h3 class="text-xl font-bold mb-2">The Lawmaker's Desk</h3>
+                <p class="text-gray-400">Navigate the complexities of IG law and winemaking regulations.</p>
+            </button>
+            <button data-module="gastronome" class="module-btn bg-gray-800 p-6 rounded-lg hover:bg-purple-700 transition-colors duration-300">
+                <h3 class="text-xl font-bold mb-2">The Gastronome's Table</h3>
+                <p class="text-gray-400">Explore classic food pairings and local cuisine.</p>
+            </button>
+            <button data-module="critic" class="module-btn bg-gray-800 p-6 rounded-lg hover:bg-purple-700 transition-colors duration-300">
+                <h3 class="text-xl font-bold mb-2">The Critic's Corner</h3>
+                <p class="text-gray-400">Analyze vintages and iconic producers.</p>
+            </button>
+        </div>
+
+
+
+
+        <div class="w-full max-w-4xl">
+            <button data-module="flashcard" class="module-btn bg-gray-800 p-6 rounded-lg hover:bg-purple-700 transition-colors duration-300 w-full">
+                <h3 class="text-xl font-bold mb-2">Flashcard Study</h3>
+                <p class="text-gray-400">Build your knowledge with targeted review.</p>
+            </button>
+        </div>
+    	
+        <button id="ai-settings-btn" class="mt-8 bg-gray-700 hover:bg-gray-600 text-white font-bold py-2 px-4 rounded">
+            ⚙️ AI Settings
+        </button>
+    </div>
+
+
+
+
+    <div id="game-screen" class="hidden min-h-screen flex flex-col items-center justify-center p-4">
+        </div>
+
+
+
+
+    <div id="modal-container" class="fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center p-4 z-50 hidden">
+        <div id="modal-content-wrapper" class="bg-gray-800 rounded-lg shadow-xl w-full max-w-2xl modal-content overflow-y-auto">
+            </div>
+    </div>
+
+
+
+
+    <script>
+        // This object contains the questions for the quiz modules
+        const gameData = {
+            historian: {
+                title: "The Historian's Scroll",
+                instructions: "For each of the 5 challenges, arrange the historical events in chronological order from earliest to latest. Tap an event to add it to your timeline, then submit your answer.",
+                questions: [
+                    {
+                        question: "Arrange these foundational events of Argentina's colonial wine history.",
+                        events: [
+                            { text: "Viticulture is introduced by Spanish colonists and Jesuit missionaries.", date: 1550 },
+                            { text: "The first recorded commercial vineyard is established in Santiago del Estero.", date: 1557 },
+                            { text: "Vineyards are established on a commercial scale in San Juan.", date: 1569 },
+                            { text: "Torrontés Riojano appears as a natural crossing.", date: 1750 },
+                            { text: "Jesuits are expelled, leading to a decline in organized viticulture.", date: 1767 },
+                        ]
+                    },
+                    {
+                        question: "Order the key events of the 19th-century transformation.",
+                        events: [
+                            { text: "Glass bottles are first introduced for wine.", date: 1820 },
+                            { text: "The Quinta Agronómica de Mendoza is approved, a pivotal moment.", date: 1853 },
+                            { text: "French agronomist Michel Aimé Pouget introduces Malbec to Argentina.", date: 1853 },
+                            { text: "A railway connecting Mendoza to Buenos Aires is completed, enabling large-scale industry.", date: 1885 },
+                            { text: "A significant influx of Spanish and Italian immigrants begins, bringing new skills.", date: 1880 },
+                        ]
+                    },
+                    {
+                        question: "Place these events from the 20th-century bulk wine era in order.",
+                        events: [
+                            { text: "Bodega Los Toneles is founded, symbolizing the 'Golden Age' of viticulture.", date: 1922 },
+                            { text: "The Fiesta Nacional de la Vendimia is first held at its official amphitheater.", date: 1936 },
+                            { text: "Fratelli Branca establishes a distillery in Buenos Aires, popularizing Fernet.", date: 1941 },
+                            { text: "Argentina's per capita wine consumption peaks at 90 liters.", date: 1970 },
+                            { text: "A vine-pull scheme reduces total vineyard area by over one-third.", date: 1980 },
+                        ]
+                    },
+                    {
+                        question: "Sequence the key moments of the modern quality revolution.",
+                        events: [
+                            { text: "Nicolás Catena Zapata begins to lead the quality movement, inspired by Napa Valley.", date: 1982 },
+                            { text: "The Luján de Cuyo DOC is established, Argentina's first.", date: 1989 },
+                            { text: "Neoliberal policies open international markets, spurring an export focus.", date: 1990 },
+                            { text: "The first vintage of 'Nicolás Catena Zapata' is produced, a benchmark luxury cuvée.", date: 1997 },
+                            { text: "Law 25.163 is sanctioned, establishing the modern IP, IG, and DOC system.", date: 1999 },
+                        ]
+                    },
+                    {
+                        question: "Organize the timeline of the modern terroir-driven movement.",
+                        events: [
+                            { text: "Decreto 57/2004 provides technical regulations for the new appellation law.", date: 2004 },
+                            { text: "The San Rafael DOC is officially approved.", date: 2007 },
+                            { text: "The Paraje Altamira IG is approved, the first based on scientific soil studies.", date: 2013 },
+                            { text: "San Pablo IG and Pampa El Cepillo IG are approved, continuing the science-based model.", date: 2019 },
+                            { text: "Criolla Chica is officially recognized as a quality wine grape.", date: 2024 },
+                        ]
+                    }
+                ]
+            },
+            terroir: {
+                title: "The Terroir Architect",
+                instructions: "Answer 10 multiple-choice questions about the geology, geography, and climate of Argentina.",
+                questions: [
+                    { q: "What is the overwhelmingly dominant geological feature that defines Argentina's wine regions?", a: "The Andes Mountains", o: ["The Pampas Plains", "The Patagonian Steppe", "The Paraná River Delta"] },
+                    { q: "The parent material for vineyard soils is primarily composed of what?", a: "Alluvial fans and terraces", o: ["Volcanic basalt", "Ancient marine limestone", "Glacial moraine"] },
+                    { q: "In the high-altitude vineyards of the Uco Valley, what critical soil component is prized for producing wines with structure and freshness?", a: "Calcium carbonate (limestone)", o: ["Iron-rich clay", "Deep sand", "Organic humus"] },
+                    { q: "What is the local term for the soil pits dug by producers to map the physical structure of their vineyards?", a: "Calicatas", o: ["Acequias", "Parcelas", "Fincas"] },
+                    { q: "In Argentina's arid, irrigated environment, which soil property is more influential on wine style than chemical fertility?", a: "Water-holding capacity", o: ["Nitrogen content", "Potassium levels", "Soil pH"] },
+                    { q: "How are the soils of lower-altitude regions like Luján de Cuyo and Maipú generally described?", a: "Deeper, with higher proportions of clay and silt", o: ["Shallow, stony, and poor in organic matter", "Pure sand over granite", "Volcanic and rocky"] },
+                    { q: "The inverse relationship in Argentine viticulture means that as latitude decreases (closer to the equator), altitude must:", a: "Increase", o: ["Decrease", "Remain the same", "Become irrelevant"] },
+                    { q: "The climate across most of Argentina's wine regions is best described as:", a: "Continental and semi-arid", o: ["Maritime and humid", "Tropical and wet", "Polar and dry"] },
+                    { q: "What is the primary viticultural risk in Mendoza, for which many premium vineyards are protected by netting?", a: "Hail (Granizo)", o: ["Drought", "Excessive rain", "Botrytis"] },
+                    { q: "What is the name of the hot, dry foehn-type wind that descends from the Andes, affecting the Cuyo region?", a: "Zonda", o: ["Pampero", "Mistral", "Sirocco"] },
+                    { q: "Which region requires the highest altitudes (1,700–3,329m) to moderate its subtropical heat?", a: "The North (Salta)", o: ["Cuyo (Mendoza)", "Patagonia (Río Negro)", "Atlantic (Buenos Aires)"] },
+                    { q: "Which region achieves a cool-climate profile at the lowest altitudes (~300m) due to its high latitude?", a: "Patagonia", o: ["Cuyo", "The North", "La Rioja"] },
+                    { q: "The aridity of Argentina's climate provides what major viticultural advantage?", a: "It minimizes fungal disease pressure", o: ["It increases soil fertility", "It eliminates the need for irrigation", "It protects against frost"] },
+                    { q: "Which of these is a significant viticultural threat in the highest altitude vineyards and in Patagonia?", a: "Frost", o: ["Heat stress", "Sunburn", "Drought"] },
+                    { q: "The extreme diurnal temperature range in Salta is crucial for developing aromatics and preserving acidity in which grape?", a: "Torrontés Riojano", o: ["Bonarda", "Criolla Grande", "Syrah"] },
+                    { q: "The soils of the Uco Valley are the result of alluvial fans from which river?", a: "The Tunuyán River", o: ["The Mendoza River", "The Río Negro", "The Colorado River"] },
+                    { q: "Wines from lower, deeper soils with more clay, like in Maipú, tend to be:", a: "Richer and more powerful with rounder tannins", o: ["More structured, floral, and elegant", "Lighter-bodied with high acidity", "Smoky with savory notes"] },
+                    { q: "What is the approximate latitude of the Mendoza wine region?", a: "~33°S", o: ["~26°S", "~39°S", "~45°S"] },
+                    { q: "What is the approximate latitude of the Salta (Cafayate) wine region?", a: "~26°S", o: ["~33°S", "~39°S", "~23°S"] },
+                    { q: "Which region has the lowest average annual precipitation?", a: "The North (Salta)", o: ["Cuyo (Mendoza)", "Patagonia", "They are all roughly equal"] },
+                    { q: "A 'chalky or mineral character' in wines is often attributed to the presence of what in the soil?", a: "Limestone", o: ["Iron", "Sand", "Clay"] },
+                    { q: "What allows for precision irrigation where micro-plots are managed according to their specific soil profiles?", a: "The study of calicatas", o: ["Satellite imagery", "Annual rainfall data", "The Zonda wind"] },
+                    { q: "Which is the official national body for geological study in Argentina?", a: "Servicio Geológico Minero Argentino (SEGEMAR)", o: ["Instituto Nacional de Vitivinicultura (INV)", "Instituto Nacional de Tecnología Agropecuaria (INTA)", "Consejo de Promoción"] },
+                    { q: "The persistent strong winds are a defining climatic feature and risk in which region?", a: "Patagonia", o: ["Cuyo", "The North", "Salta"] },
+                    { q: "What natural phenomenon ensures the supply of water for irrigation in this desert climate?", a: "Andean snowmelt", o: ["Summer monsoons", "Underground aquifers", "Coastal fog"] },
+                    { q: "Wines from high-altitude, stony soils with low water-holding capacity typically come from what kind of grapes?", a: "Smaller berries with thicker skins", o: ["Larger berries with thinner skins", "Grapes with lower acidity", "Grapes with lower sugar content"] },
+                    { q: "The extreme heterogeneity of Argentine soils is a result of what depositional process?", a: "Fluvial and alluvial", o: ["Volcanic eruption", "Glacial movement", "Marine sedimentation"] },
+                    { q: "What is the primary limiting factor for vine growth in Argentina?", a: "Water", o: ["Sunlight", "Nutrients", "Heat"] },
+                    { q: "The Uco Valley is located at the foot of which part of the Andes?", a: "The Cordillera Frontal", o: ["The Precordillera", "The Cordillera Principal", "The Sierra de Famatina"] },
+                    { q: "Which macro-region accounts for the vast majority of Argentina's wine production?", a: "Cuyo", o: ["The North", "Patagonia", "Atlantic"] },
+                    { q: "What is the primary topographical feature uniting all of Argentina's major wine regions?", a: "Their location in the foothills of the Andes", o: ["Their proximity to the Atlantic Ocean", "Their placement on a high central plateau", "Their location along major river systems"] },
+                    { q: "Why is organic viticulture relatively easy to practice in Argentina?", a: "The dry climate minimizes fungal disease", o: ["The soils are naturally fertile", "There are no native pests", "Government subsidies encourage it"] },
+                    { q: "Which department in Mendoza is known for having the highest altitude vineyards?", a: "Tupungato", o: ["Maipú", "Rivadavia", "San Rafael"] },
+                    { q: "What is the defining characteristic of a 'continental' climate?", a: "Four distinct seasons with large temperature differences", o: ["Mild, wet winters and hot, dry summers", "Consistent temperatures year-round", "High humidity and rainfall"] },
+                    { q: "The white coating of calcium carbonate on alluvial stones is a result of what process?", a: "Ancient water flows precipitating the mineral", o: ["Wind-blown dust accumulation", "A chemical reaction with granite", "Application of agricultural lime"] },
+                    { q: "What is the approximate elevation range for quality vineyards in the Uco Valley?", a: "900 – 1,700 meters", o: ["Up to 300 meters", "300 – 600 meters", "Over 2,000 meters"] },
+                    { q: "Which region's climate is described as 'subtropical mountainous'?", a: "The North (Salta)", o: ["Cuyo (Mendoza)", "Patagonia", "Buenos Aires"] },
+                    { q: "Compared to Cuyo, the climate in Patagonia has a:", a: "Lower average temperature and more wind", o: ["Higher average temperature and less wind", "More rainfall and higher humidity", "Less sun and shorter days"] },
+                    { q: "What term describes the geological structures created by rivers carrying eroded sediment from the mountains?", a: "Alluvial fans", o: ["Moraines", "Calderas", "Mesas"] },
+                    { q: "The successful cultivation of Pinot Noir in Patagonia is largely due to what climatic factor?", a: "High latitude and cool temperatures", o: ["High altitude and intense sun", "Low rainfall and sandy soils", "The Zonda wind effect"] },
+                    { q: "Why do shallow, stony soils create a desirable, controlled water stress?", a: "They have low water-holding capacity", o: ["They reflect sunlight, increasing heat", "They have a high pH", "They are poor in nutrients"] },
+                    { q: "The intensive study of soils in Argentina is a relatively ____ phenomenon.", a: "Recent, driven by the modern quality movement", o: ["Ancient, dating back to colonial times", "Unimportant, due to irrigation", "Mandated by the government in the 1950s"] },
+                    { q: "What is the general trend for soil texture as you move eastward away from the Andes?", a: "It becomes finer, with more silt and clay", o: ["It becomes stonier and coarser", "It becomes more volcanic", "It remains consistently sandy"] },
+                    { q: "The Tunuyán River is a key geographical feature in which important sub-region?", a: "Valle de Uco", o: ["Luján de Cuyo", "Maipú", "Salta"] },
+                    { q: "Intense solar radiation at high altitudes helps develop what in grape skins?", a: "Thicker skins with more anthocyanins and polyphenols", o: ["Thinner skins with less color", "Higher water content", "Resistance to frost"] },
+                    { q: "What is the primary reason for the vast diurnal temperature range in regions like Salta?", a: "Extreme altitude", o: ["Proximity to the ocean", "High latitude", "Dense forest cover"] },
+                    { q: "The risk of the Zonda wind is most pronounced during which part of the growing season?", a: "Late spring and early summer, during flowering", o: ["Mid-winter, during dormancy", "Late summer, during veraison", "Autumn, during harvest"] },
+                    { q: "The physical properties of soil are considered more important than chemical fertility primarily because of what practice?", a: "Controlled irrigation", o: ["Organic farming", "High-density planting", "Mechanical harvesting"] },
+                    { q: "Which risk can completely destroy a vineyard's crop in a matter of minutes?", a: "Hail (Granizo)", o: ["Frost", "Zonda wind", "Drought"] },
+                    { q: "The viticultural landscape of Argentina is often described as a series of what in the desert?", a: "Oases", o: ["Islands", "Valleys", "Plateaus"] }
+                ]
+            },
+            ampelographer: {
+                title: "The Ampelographer's Challenge",
+                instructions: "Answer 10 multiple-choice questions about the key grape varieties and viticulture of Argentina. After a correct answer, you may have the option to generate an AI profile.",
+                questions: [
+                    { q: "DNA analysis confirmed that Malbec is a natural cross of Magdeleine Noire des Charentes and what other grape?", a: "Prunelard", o: ["Tannat", "Merlot", "Cabernet Franc"], subjectType: 'grape', subjectName: 'Malbec' },
+                    { q: "What is the confirmed parentage of Torrontés Riojano, Argentina's signature white grape?", a: "Muscat of Alexandria x Criolla Chica", o: ["Chardonnay x Chenin Blanc", "Torrontés Sanjuanino x Torrontés Mendocino", "Sauvignon Blanc x Semillon"], subjectType: 'grape', subjectName: 'Torrontés Riojano' },
+                    { q: "Argentina's second most planted red variety, Bonarda, is genetically identical to which French grape?", a: "Douce Noir", o: ["Bonarda Piemontese", "Négrette", "Trousseau"], subjectType: 'grape', subjectName: 'Bonarda (Douce Noir)' },
+                    { q: "What is the traditional high pergola vine training system used in Argentina's bulk wine era?", a: "Parral Cuyano", o: ["Vertical Shoot Positioning (VSP)", "Guyot", "Gobelet"], subjectType: 'viticulture', subjectName: 'Parral Cuyano' },
+                    { q: "The historic Malbec plant material in Argentina is significant because it was introduced from France when?", a: "Before the phylloxera epidemic", o: ["After World War II", "In the 1990s", "During the 18th century"], subjectType: 'clone', subjectName: 'Argentine Malbec Selections' },
+                    { q: "Which of the three Torrontés varieties is considered the highest quality and most aromatic?", a: "Torrontés Riojano", o: ["Torrontés Sanjuanino", "Torrontés Mendocino", "They are of equal quality"], subjectType: 'grape', subjectName: 'Torrontés Riojano' },
+                    { q: "What modern irrigation method is the standard for quality viticulture, allowing for controlled water stress?", a: "Drip irrigation", o: ["Flood irrigation", "Overhead sprinklers", "Dry farming"], subjectType: 'viticulture', subjectName: 'Drip Irrigation' },
+                    { q: "Which variety has emerged as a star performer in cooler, high-altitude sites, yielding aromatic, peppery red wines?", a: "Cabernet Franc", o: ["Bonarda", "Tannat", "Petit Verdot"], subjectType: 'grape', subjectName: 'Argentine Cabernet Franc' },
+                    { q: "What viticultural problem, meaning poor fruit set, can affect Malbec in adverse flowering conditions?", a: "Coulure", o: ["Millerandage", "Shatter", "Veraison"], subjectType: 'viticulture', subjectName: 'Malbec Viticulture' },
+                    { q: "The 'Criolla Revival' refers to a movement of making quality wines from which type of grapes?", a: "Heritage grapes previously used for bulk wine", o: ["Newly developed hybrid grapes", "Imported clones from Italy", "Grapes grown in coastal regions"], subjectType: 'viticulture', subjectName: 'Criolla Revival' },
+                    { q: "What is the modern, near-universal vine training system used for quality wine production in Argentina?", a: "Vertical Shoot Positioning (VSP)", o: ["Parral Cuyano", "Bush vines", "Tendone"], subjectType: 'viticulture', subjectName: 'Vertical Shoot Positioning (VSP)' },
+                    { q: "The national institute that researches and certifies grape clones like Malbec and Torrontés is known as:", a: "INTA (Instituto Nacional de Tecnología Agropecuaria)", o: ["INV (Instituto Nacional de Vitivinicultura)", "SEGEMAR", "CONICET"], subjectType: 'viticulture', subjectName: 'INTA' },
+                    { q: "The aromatic profile of Torrontés Riojano is most comparable to which other grape variety?", a: "Muscat", o: ["Chardonnay", "Sauvignon Blanc", "Pinot Grigio"], subjectType: 'grape', subjectName: 'Torrontés Riojano' },
+                    { q: "Compared to modern French clones, Argentine selections of Malbec often exhibit:", a: "Smaller berries and softer tannins", o: ["Larger clusters and higher yields", "Thicker skins and harsher tannins", "Lighter color and lower alcohol"], subjectType: 'clone', subjectName: 'Argentine Malbec Selections' },
+                    { q: "Which of these remains one of the most planted white varieties but is primarily used for bulk wine?", a: "Pedro Giménez", o: ["Chardonnay", "Sauvignon Blanc", "Torrontés Riojano"], subjectType: 'grape', subjectName: 'Pedro Giménez' },
+                    { q: "What are 'acequias'?", a: "A network of irrigation ditches or canals", o: ["Soil pits for geological analysis", "A type of pergola system", "Anti-hail nets"], subjectType: 'viticulture', subjectName: 'Irrigation in Argentina' },
+                    { q: "The intense floral (violet) notes in Malbec are most pronounced when it's grown in what type of environment?", a: "Cool, high-altitude vineyards", o: ["Warm, low-altitude vineyards", "Sandy soils near a river", "Clay-heavy, fertile soils"], subjectType: 'wine', subjectName: 'High-Altitude Malbec' },
+                    { q: "What is a key benefit of the traditional Parral Cuyano system?", a: "It protects fruit from intense sun and facilitates flood irrigation", o: ["It allows for precise canopy management", "It is easily mechanized for harvesting", "It restricts vigor and lowers yields"], subjectType: 'viticulture', subjectName: 'Parral Cuyano' },
+                    { q: "The renewed focus on old-vine plantings of Semillón and Chenin Blanc aims to produce what style of wine?", a: "Complex, age-worthy white wines", o: ["Simple, fruity table wines", "Aromatic sparkling wines", "Sweet dessert wines"], subjectType: 'wine', subjectName: 'Argentine Old Vine Whites' },
+                    { q: "What is the original French region and name for Malbec?", a: "Cahors, where it is known as Côt", o: ["Bordeaux, where it is known as Pressac", "Loire Valley, where it is known as Pineau d'Aunis", "Savoie, where it is known as Mondeuse"], subjectType: 'grape', subjectName: 'Malbec' },
+                    { q: "The defining aromatic characteristic of Torrontés Riojano includes pronounced notes of rose petals, jasmine, and what other flower?", a: "Geranium", o: ["Violet", "Lavender", "Honeysuckle"], subjectType: 'grape', subjectName: 'Torrontés Riojano' },
+                    { q: "Irrigation in Argentina is considered:", a: "A fundamental necessity", o: ["A supplemental practice for dry years", "Illegal for quality wines", "A recent innovation"], subjectType: 'viticulture', subjectName: 'Irrigation in Argentina' },
+                    { q: "Which research body, founded by a major producer, has collaborated with UC Davis on Malbec clonal studies?", a: "The Catena Institute of Wine", o: ["The Bemberg Institute", "The Zuccardi Foundation", "The Rolland Institute"], subjectType: 'clone', subjectName: 'Argentine Malbec Selections' },
+                    { q: "Despite its intensely perfumed bouquet, Torrontés Riojano wine is typically vinified in what style?", a: "Dry", o: ["Sweet", "Off-dry", "Oxidative"], subjectType: 'wine', subjectName: 'Torrontés Riojano' },
+                    { q: "High-density plantings in modern vineyards can exceed how many vines per hectare?", a: "5,500", o: ["1,600", "2,500", "3,500"], subjectType: 'viticulture', subjectName: 'Planting Density' },
+                    { q: "The indigenous Huarpe people are credited with developing what early technology?", a: "Sophisticated canal systems for irrigation", o: ["The Parral vine training system", "Terraced vineyards in the Andes", "Clay amphorae for fermentation"], subjectType: 'viticulture', subjectName: 'Irrigation in Argentina' },
+                    { q: "In August 2024, the INV officially recognized which heritage grape as suitable for 'vino de calidad'?", a: "Criolla Chica", o: ["Criolla Grande", "Cereza", "Pedro Giménez"], subjectType: 'grape', subjectName: 'Criolla Chica' },
+                    { q: "Which red grape is NOT Douce Noir from Savoie?", a: "Bonarda Piemontese", o: ["Charbono", "Argentine Bonarda", "All are Douce Noir"], subjectType: 'grape', subjectName: 'Bonarda (Douce Noir)' },
+                    { q: "What is a characteristic palate feature of Torrontés Riojano that adds to its complexity?", a: "A subtle hint of bitterness on the finish", o: ["A rich, buttery texture", "A high level of tannin", "A smoky, mineral quality"], subjectType: 'grape', subjectName: 'Torrontés Riojano' },
+                    { q: "Malbec is a mid-ripening variety that requires significant sun and heat to fully mature what component?", a: "Tannins", o: ["Acidity", "Sugar", "Color"], subjectType: 'grape', subjectName: 'Malbec' },
+                    { q: "What is the common name for Criolla Chica in Chile and California, respectively?", a: "País and Mission", o: ["Zinfandel and Primitivo", "Carignan and Mazuelo", "Syrah and Shiraz"], subjectType: 'grape', subjectName: 'Criolla Chica' },
+                    { q: "Which institute maintains an active clonal selection program for Malbec, identifying clones like TA 16 and TA 24?", a: "INTA", o: ["INV", "Catena Institute", "UC Davis"], subjectType: 'clone', subjectName: 'Argentine Malbec Selections' },
+                    { q: "High-altitude Chardonnay from areas like the Uco Valley is known for producing what style of wines?", a: "Styles ranging from crisp and mineral-driven to rich and oaked", o: ["Exclusively simple, fruity, and unoaked styles", "Heavy, low-acid, tropical styles", "Sweet, botrytized styles"], subjectType: 'wine', subjectName: 'High-Altitude Chardonnay' },
+                    { q: "The traditional method of flood irrigation encourages the development of what in the vine?", a: "Deep root systems", o: ["Shallow root systems", "Excessive vegetative growth", "Small, concentrated berries"], subjectType: 'viticulture', subjectName: 'Flood Irrigation' },
+                    { q: "Which red grape, widely planted in Argentina, produces rich, full-bodied wines with softer tannins than in many other world regions?", a: "Cabernet Sauvignon", o: ["Pinot Noir", "Tempranillo", "Nebbiolo"], subjectType: 'grape', subjectName: 'Argentine Cabernet Sauvignon' },
+                    { q: "Torrontés Riojano is particularly well-suited to the sun-drenched, arid vineyards of which region?", a: "Salta", o: ["Mendoza", "Patagonia", "Buenos Aires"], subjectType: 'grape', subjectName: 'Torrontés Riojano' },
+                    { q: "Why are there no national regulations for planting density in Argentina?", a: "Practices vary widely based on region, tradition, and quality goals", o: ["The INV has not yet addressed the issue", "It is regulated at the provincial level instead", "All vineyards follow a single, traditional spacing"], subjectType: 'viticulture', subjectName: 'Planting Density' },
+                    { q: "Which grape is the mother of Malbec?", a: "Magdeleine Noire des Charentes", o: ["Prunelard", "Muscat of Alexandria", "Criolla Chica"], subjectType: 'grape', subjectName: 'Malbec' },
+                    { q: "What is the primary reason for using VSP trellising in modern viticulture?", a: "It allows for precise canopy management and mechanization", o: ["It is the most effective system for flood irrigation", "It completely shades the fruit from the sun", "It is the traditional system of the Cuyo region"], subjectType: 'viticulture', subjectName: 'Vertical Shoot Positioning (VSP)' },
+                    { q: "The Criolla Revival can be seen as the third wave in Argentine wine evolution, following the bulk era and what other revolution?", a: "The Malbec-led international quality revolution", o: ["The organic farming revolution", "The sparkling wine revolution", "The foreign investment revolution"], subjectType: 'viticulture', subjectName: 'Criolla Revival' },
+                    { q: "Which of these is NOT a legally allowable grape variety for quality wine production in Argentina?", a: "Vitis Labrusca", o: ["Syrah", "Pinot Noir", "Chardonnay"], subjectType: 'grape', subjectName: 'Allowable Grape Varieties' },
+                    { q: "The intense solar radiation in high-altitude regions promotes the development of what?", a: "Thick grape skins", o: ["High acidity", "Low sugar levels", "Large clusters"], subjectType: 'viticulture', subjectName: 'High-Altitude Viticulture' },
+                    { q: "Which grape is the mother of Torrontés Riojano?", a: "Muscat of Alexandria", o: ["Criolla Chica", "Magdeleine Noire des Charentes", "An unidentified parent"], subjectType: 'grape', subjectName: 'Torrontés Riojano' },
+                    { q: "What is the primary difference between Torrontés Riojano and Torrontés Mendocino?", a: "They have different parentage", o: ["Riojano is red and Mendocino is white", "Riojano is grown in Spain, Mendocino in Argentina", "There is no genetic difference"], subjectType: 'grape', subjectName: 'Torrontés' },
+                    { q: "Maximum yield limits, such as 10 tons per hectare, are only mandated within what specific legal designation?", a: "A DOC (Denominación de Origen Controlada)", o: ["An IG (Indicación Geográfica)", "An IP (Indicación de Procedencia)", "They are mandated nationwide"], subjectType: 'viticulture', subjectName: 'Yield Limits' },
+                    { q: "Malbec from warmer, lower-altitude sites like Eastern Mendoza typically shows a profile of:", a: "Plum and blackberry with soft, plush tannins", o: "Violet and red fruit with firm, structured tannins", o: "Herbal notes with high acidity", o: "Earthy notes with light body"], subjectType: 'wine', subjectName: 'Low-Altitude Malbec' },
+                    { q: "The 'Criolla' grapes were historically associated with what era of Argentine wine?", a: "The low-quality bulk wine era", o: ["The modern quality revolution", "The colonial missionary era", "The French immigrant era"], subjectType: 'grape', subjectName: 'Criolla Grapes' },
+                    { q: "The scientific name for the common wine grape is:", a: "Vitis vinifera", o: ["Vitis labrusca", "Vitis riparia", "Vitis rupestris"], subjectType: 'viticulture', subjectName: 'Vitis Vinifera' },
+                    { q: "The ability to impose controlled water stress is a key advantage of which practice?", a: "Drip irrigation", o: ["Flood irrigation", "Parral training", "High-density planting"], subjectType: 'viticulture', subjectName: 'Drip Irrigation' },
+                    { q: "Jancis Robinson has famously stated that Argentina is making 'better Cabernet Franc than...' where?", a: "The Loire", o: ["Bordeaux", "California", "Italy"], subjectType: 'grape', subjectName: 'Argentine Cabernet Franc' }
+                ]
+            },
+            lawmaker: {
+                title: "The Lawmaker's Desk",
+                instructions: "Answer 10 multiple-choice questions about the appellation laws and winemaking regulations of Argentina.",
+                questions: [
+                    { q: "What is the name of the landmark 1999 legislation that established Argentina's modern three-tier appellation system?", a: "Law 25.163", o: ["Decreto 57/2004", "Resolución 22/2025", "The Mendoza Act of 1989"] },
+                    { q: "What is the highest and strictest classification in the Argentine quality pyramid?", a: "Denominación de Origen Controlada (DOC)", o: ["Indicación Geográfica (IG)", "Indicación de Procedencia (IP)", "Gran Reserva"] },
+                    { q: "For a wine to be labeled with a single grape variety, what is the minimum percentage required of that variety?", a: "85%", o: ["80%", "95%", "100%"] },
+                    { q: "For a red wine to be labeled 'Reserva', what is the minimum aging period required before release?", a: "12 months", o: ["6 months", "18 months", "24 months"] },
+                    { q: "For a red wine to be labeled 'Gran Reserva', what is the minimum aging period required?", a: "24 months", o: ["12 months", "18 months", "36 months"] },
+                    { q: "Which governmental body administers Argentina's wine laws and appellation system?", a: "Instituto Nacional de Vitivinicultura (INV)", o: ["Servicio Geológico Minero Argentino (SEGEMAR)", "Consejo de Promoción", "Wines of Argentina"] },
+                    { q: "What was Argentina's first DOC, established in 1989 for the Malbec grape?", a: "Luján de Cuyo DOC", o: ["San Rafael DOC", "Paraje Altamira DOC", "Valle de Uco DOC"] },
+                    { q: "Which classification is the most widely used and dynamic, identifying wines from a specific, delimited terroir?", a: "Indicación Geográfica (IG)", o: ["Denominación de Origen Controlada (DOC)", "Indicación de Procedencia (IP)", "Vino de Calidad"] },
+                    { q: "Which of these is NOT a legally defined macro-region for winemaking?", a: "The Andes", o: ["The North", "Cuyo", "Patagonia and Atlantic"] },
+                    { q: "As of a 2024 INV resolution, what modern oenological practice is legally permitted in Argentina?", a: "Partial dealcoholization of wine", o: ["Chaptalization (adding sugar)", "Adding artificial flavors", "Diluting wine with water"] },
+                    { q: "What does the 'Indicación de Procedencia' (IP) designation typically indicate?", a: "Origin from a large political unit like a province", o: ["Adherence to strict production rules", "Origin from a specific, terroir-defined parcel", "A minimum aging requirement"] },
+                    { q: "The approval of which IG marked a fundamental shift to science-based appellations defined by soil and climate rather than political lines?", a: "Paraje Altamira IG", o: ["Luján de Cuyo IG", "Mendoza IG", "Salta IG"] },
+                    { q: "The Luján de Cuyo DOC mandates a minimum aging period that includes at least how long in oak barrels?", a: "One year", o: ["Six months", "18 months", "No oak is required"] },
+                    { q: "For a white or rosé wine to be labeled 'Gran Reserva', what is the minimum aging period?", a: "12 months", o: ["6 months", "18 months", "24 months"] },
+                    { q: "The detailed technical regulations for implementing Law 25.163 were provided in which 2004 document?", a: "Decreto 57/2004", o: ["Resolución 5/2024", "The Mendoza Accord", "The Salta Protocol"] },
+                    { q: "Unlike Old World systems, Argentina's legal framework was not the catalyst for its quality revolution, but rather its:", a: "Formalization", o: ["Cause", "Inhibitor", "Opponent"] },
+                    { q: "Each DOC is governed by a local regulatory body known as the:", a: "Consejo de Promoción (Promotion Council)", o: ["Instituto Nacional de Vitivinicultura (INV)", "Comité de Apelación", "Junta de Viticultores"] },
+                    { q: "The sweet sparkling wine designation 'Extra Brut' in Argentina allows up to how many grams per liter of sugar?", a: "8 g/L", o: ["2 g/L", "14 g/L", "25 g/L"] },
+                    { q: "Which common winemaking adjustment is permitted and often used to ensure balance and freshness, especially in warmer sites?", a: "Acidification", o: ["Chaptalization", "Amelioration (adding water)", "Deacidification"] },
+                    { q: "The Cuyo region comprises Mendoza, San Juan, and which other province?", a: "La Rioja", o: ["Salta", "Catamarca", "Neuquén"] },
+                    { q: "Which practice is unnecessary and not a feature of Argentine winemaking due to the warm, sunny climate?", a: "Chaptalization", o: ["Acidification", "Irrigation", "Oak aging"] },
+                    { q: "The 'Primera Zona' or 'First Zone' refers to the historic, high-quality departments of Luján de Cuyo and:", a: "Maipú", o: ["Tupungato", "San Rafael", "Rivadavia"] },
+                    { q: "The Luján de Cuyo DOC has a mandated maximum yield of less than:", a: "10 tons per hectare", o: ["15 tons per hectare", "20 tons per hectare", "There is no yield limit"] },
+                    { q: "What is the minimum percentage of grapes required from an IP-stated area (e.g., 'Mendoza') for table wines?", a: "80%", o: ["85%", "95%", "100%"] },
+                    { q: "Which is Argentina's second approved DOC, applying to all wine styles that meet its council's standards?", a: "San Rafael DOC", o: ["Gualtallary DOC", "Cafayate DOC", "Río Negro DOC"] },
+                    { q: "Which department is NOT part of the Valle de Uco IG?", a: "Luján de Cuyo", o: ["Tupungato", "Tunuyán", "San Carlos"] },
+                    { q: "For a wine labeled as a blend of 'Malbec - Cabernet Sauvignon', what is the minimum percentage required for each variety?", a: "There is no minimum as long as they are the top two", o: ["42.5% each", "51% Malbec, 49% Cabernet", "75% Malbec, 25% Cabernet"] },
+                    { q: "The Argentine legal nomenclature for sparkling wine sweetness is:", a: "Different from the European standard", o: ["Identical to the European standard", "Not legally regulated", "Only applies to the Charmat method"] },
+                    { q: "The legal framework in Argentina is a hallmark of many New World regions because it was:", a: "Producer-led and formalized existing quality", o: ["State-controlled and imposed from the top-down", "Based on the German Prädikat system", "Developed by French consultants"] },
+                    { q: "Which district, known for high-quality Malbec, straddles both the Maipú and Luján de Cuyo departments?", a: "Lunlunta", o: ["Agrelo", "Gualtallary", "Vistalba"] },
+                    { q: "The North macro-region includes Salta, Jujuy, Tucumán and which other province?", a: "Catamarca", o: ["La Rioja", "San Juan", "Córdoba"] },
+                    { q: "Varietal, Reserva, and Gran Reserva wines are officially exempted from what annual INV regulation?", a: "Regional minimum alcohol levels", o: ["Maximum yield restrictions", "Mandatory aging periods", "Authorized grape varieties"] },
+                    { q: "What is the sweetest category for sparkling wine under Argentine law?", a: "Dulce (more than 25 g/L)", o: ["Demi Sec (up to 25 g/L)", "Brut (up to 14 g/L)", "Seco"] },
+                    { q: "For a white wine to be labeled 'Reserva', what is the minimum aging period?", a: "6 months", o: ["3 months", "12 months", "No aging required"] },
+                    { q: "The creation of new IGs like San Pablo and Pampa El Cepillo are based on what criteria?", a: "Geographical and climatic factors", o: ["Political department boundaries", "Historical vineyard ownership", "Producer reputation"] },
+                    { q: "The Patagonia and Atlantic region includes Río Negro, Neuquén, La Pampa, and which other province?", a: "Chubut", o: ["Santa Cruz", "Tierra del Fuego", "Córdoba"] },
+                    { q: "What legal term is used for a place-defined GI like Paraje Altamira?", a: "Paraje", o: ["Distrito", "Departamento", "Zona"] },
+                    { q: "Which of these is a legally defined district IG within Tupungato?", a: "Gualtallary", o: ["Paraje Altamira", "Agrelo", "La Consulta"] },
+                    { q: "Under INV Resolution 5/2024, a producer can reduce a wine's ethanol content by up to what percentage?", a: "20%", o: ["10%", "5%", "It is illegal to reduce alcohol"] },
+                    { q: "Which of these is a legally defined district IG within Tunuyán?", a: "Los Chacayes", o: ["San Pablo", "Gualtallary", "Pampa El Cepillo"] },
+                    { q: "The Argentine quality pyramid consists of how many tiers?", a: "Three", o: ["Two", "Four", "Five"] },
+                    { q: "Which IG is also a DOC?", a: "San Rafael", o: ["Paraje Altamira", "Luján de Cuyo", "Valle de Uco"] },
+                    { q: "Is Gualtallary a legally recognized IG?", a: "Yes, it is a District IG in Tupungato", o: ["No, it is only a marketing term", "Yes, it is its own DOC", "No, it is part of the Paraje Altamira IG"] },
+                    { q: "What does 'Vino Espumoso' mean on a label?", a: "Sparkling wine", o: ["Red wine", "White wine", "Rosé wine"] },
+                    { q: "The INV unifies the list of authorized Vitis vinifera varieties in what type of legal document?", a: "A Resolución", o: ["A Decreto", "A Ley (Law)", "A Norma"] },
+                    { q: "The 'Brut' designation for Argentine sparkling wine allows for more sugar than its European counterpart. What is the limit?", a: "Up to 14 g/L", o: ["Up to 12 g/L", "Up to 8 g/L", "Up to 2 g/L"] },
+                    { q: "Which district IG is located within the department of San Carlos?", a: "La Consulta", o: ["Agrelo", "Gualtallary", "Vista Flores"] },
+                    { q: "The Argentine appellation system is primarily based on what?", a: "Geographical origin", o: ["Guaranteed quality level", "Wine style", "Price"] },
+                    { q: "The modern legal structure for wine was not codified until which year?", a: "1999", o: ["1983", "1991", "2004"] },
+                    { q: "Which of these is a legally defined Department IG?", a: "Maipú", o: ["Paraje Altamira", "Cuyo", "Mendoza"] }
+                ]
+            },
+            gastronome: {
+                title: "The Gastronome's Table",
+                instructions: "Answer 10 multiple-choice questions about the cuisine, ingredients, and classic pairings of Argentina. After a correct answer, you may have the option to generate an AI explanation.",
+                questions: [
+                    { q: "What is Argentina's unofficial national spirit, famously mixed with Coca-Cola?", a: "Fernet", o: ["Pisco", "Aguardiente", "Gin"], subjectType: 'spirit', subjectName: 'Fernet' },
+                    { q: "What is the name of the traditional Argentine barbecue, which is central to social life?", a: "Asado", o: ["Parrillada", "Churrasco", "Locro"], subjectType: 'dish', subjectName: 'Asado' },
+                    { q: "The most famous Patagonian dish is a whole lamb slow-roasted over an open fire, known as:", a: "Cordero al Palo", o: ["Lechón al Horno", "Asado de Tira", "Bife de Chorizo"], subjectType: 'dish', subjectName: 'Cordero al Palo' },
+                    { q: "Empanadas from the Mendoza region are distinguished by what characteristic?", a: "They are baked and contain olives and hard-boiled egg", o: ["They are fried and contain potato", "They are small, juicy, and spicy", "They are sweet and filled with fruit"], subjectType: 'dish', subjectName: 'Empanadas Mendocinas' },
+                    { q: "Which thick, hearty stew of hominy corn, beans, and meat is considered a national dish with roots in the northwest?", a: "Locro", o: ["Carbonada", "Guiso", "Tomaticán"], subjectType: 'dish', subjectName: 'Locro' },
+                    { q: "The Milan-based company Fratelli Branca solidified Fernet's cultural dominance by opening a distillery in Buenos Aires in what year?", a: "1941", o: ["1922", "1905", "1965"], subjectType: 'spirit', subjectName: 'Fernet' },
+                    { q: "What is the classic Argentine sauce for grilled meat, made from parsley, garlic, oregano, and oil?", a: "Chimichurri", o: ["Salsa criolla", "Salsa golf", "Romesco"], subjectType: 'ingredient', subjectName: 'Chimichurri' },
+                    { q: "The cuisine of Salta and The North shows stronger influences from which culture?", a: "Indigenous Andean", o: ["Italian immigrant", "German colonial", "Patagonian hunter-gatherer"], subjectType: 'gastronomy', subjectName: 'Northern Argentine Cuisine' },
+                    { q: "The craft gin 'Principe de los Apostoles' is notable for using which unique Argentine botanical?", a: "Yerba mate", o: ["Calafate berry", "Yatay palm fruit", "Malbec grape skins"], subjectType: 'spirit', subjectName: 'Principe de los Apostoles Gin' },
+                    { q: "Which of these is NOT a key local ingredient in Patagonian cuisine?", a: "Quinoa", o: ["Lamb", "Freshwater trout", "King crab (centolla)"], subjectType: 'ingredient', subjectName: 'Patagonian Ingredients' },
+                    { q: "What is 'charqui', a key ingredient in the cuisine of The North?", a: "Sun-dried meat", o: ["A type of corn", "A spicy chili pepper", "A root vegetable"], subjectType: 'ingredient', subjectName: 'Charqui' },
+                    { q: "The native Calafate berry is used to make jams and sauces in which region?", a: "Patagonia", o: ["Cuyo", "The North", "Buenos Aires"], subjectType: 'ingredient', subjectName: 'Calafate Berry' },
+                    { q: "A powerful, full-bodied Malbec from Mendoza is the classic pairing for what dish?", a: "Asado (grilled beef)", o: ["Patagonian trout", "Humita en chala", "Ceviche"], subjectType: 'wine_pairing', subjectName: 'Asado and Malbec' },
+                    { q: "An aromatic, high-acid Torrontés from Salta is an ideal pairing for what type of cuisine?", a: "Spicy Northern dishes like empanadas salteñas", o: ["Rich Patagonian lamb", "Creamy pasta dishes", "Heavy beef stews"], subjectType: 'wine_pairing', subjectName: 'Torrontés and Northern Cuisine' },
+                    { q: "The combination of Fernet and Coca-Cola is known as:", a: "Fernet con Coca", o: ["El Clásico", "La Mezcla", "Córdoba Libre"], subjectType: 'beverage', subjectName: 'Fernet con Coca' },
+                    { q: "A 'parrilla' can refer to a steakhouse or what specific object?", a: "The grill itself", o: ["A cut of meat", "A type of sausage", "A wine glass"], subjectType: 'gastronomy', subjectName: 'Parrilla' },
+                    { q: "What is 'humita en chala'?", a: "A savory pudding of fresh corn steamed in its own husk", o: ["A type of grilled sausage", "A potato and cheese casserole", "A fried pastry"], subjectType: 'dish', subjectName: 'Humita en chala' },
+                    { q: "Besides beef, the cuisine of The North is known for dishes featuring what other meats?", a: "Llama and goat", o: ["Wild boar and guanaco", "Pork and chicken", "Duck and rabbit"], subjectType: 'gastronomy', subjectName: 'Northern Argentine Cuisine' },
+                    { q: "Yatay Liqueur is an artisanal product from Entre Rios made from what?", a: "The fruit of the native Butia Yatay palm", o: ["Herbs and spices", "Fermented grapes", "Distilled sugar cane"], subjectType: 'liqueur', subjectName: 'Yatay Liqueur' },
+                    { q: "An elegant, cool-climate Pinot Noir from Patagonia would be an excellent match for what local dish?", a: "Patagonian trout", o: ["Locro stew", "Empanadas salteñas", "Asado with chimichurri"], subjectType: 'wine_pairing', subjectName: 'Trout and Pinot Noir' },
+                    { q: "What is 'ojo de bife'?", a: "A prized cut of beef (ribeye)", o: ["A type of blood sausage", "A spicy marinade", "A vegetable side dish"], subjectType: 'dish', subjectName: 'Asado' },
+                    { q: "The rise of 'cerveza artesanal' refers to the growing culture of what in Argentina?", a: "Craft beer", o: ["Artisanal cider", "Small-batch spirits", "Traditional liqueurs"], subjectType: 'beverage', subjectName: 'Argentine Craft Beer' },
+                    { q: "Which Patagonian ingredient is also known as 'king crab'?", a: "Centolla", o: ["Guanaco", "Mariscos", "Trucha"], subjectType: 'ingredient', subjectName: 'Centolla (King Crab)' },
+                    { q: "A rustic, home-style stew from Cuyo made with tomato, onion, and egg is called:", a: "Tomaticán", o: ["Locro", "Carbonada", "Humita"], subjectType: 'dish', subjectName: 'Tomaticán' },
+                    { q: "Argentina is the largest consumer of Fernet outside of which country?", a: "Italy", o: ["Spain", "France", "The United States"], subjectType: 'spirit', subjectName: 'Fernet' },
+                    { q: "Game meats such as guanaco and wild boar are specialties of which region?", a: "Patagonia", o: ["The North", "Cuyo", "The Pampas"], subjectType: 'gastronomy', subjectName: 'Patagonian Cuisine' },
+                    { q: "The cuisine of Cuyo is the heartland of Argentine wine culture and what else?", a: "Beef culture", o: ["Seafood culture", "Pasta culture", "Dairy culture"], subjectType: 'gastronomy', subjectName: 'Cuisine of Cuyo' },
+                    { q: "Empanadas Salteñas are famously ____ than their Mendocinian counterparts.", a: "Smaller and juicier", o: ["Larger and drier", "Spicier and fried", "Sweeter and baked"], subjectType: 'dish', subjectName: 'Empanadas Salteñas' },
+                    { q: "Which of these is NOT a key ingredient in the cuisine of The North?", a: "Olives", o: ["Corn", "Potatoes", "Chili peppers (ají)"], subjectType: 'ingredient', subjectName: 'Northern Ingredients' },
+                    { q: "A structured, high-altitude Cabernet Franc from the Uco Valley pairs well with:", a: "Grilled meats and herbal sauces", o: ["Delicate white fish", "Creamy cheese dishes", "Sweet desserts"], subjectType: 'wine_pairing', subjectName: 'Cabernet Franc Pairings' },
+                    { q: "Which of these is a major craft beer pub/brewery in Argentina?", a: "Antares", o: ["Quilmes", "Brahma", "Patagonia (the large brand)"], subjectType: 'beverage', subjectName: 'Argentine Craft Beer' },
+                    { q: "What is a 'tamal'?", a: "A dish made of masa, steamed in a corn husk or banana leaf", o: ["A type of thick stew", "A grilled flatbread", "A fruit-based dessert"], subjectType: 'dish', subjectName: 'Tamal' },
+                    { q: "The culinary traditions of Patagonia were shaped by its rugged landscape and immigrants from which European countries?", a: "Welsh and German", o: ["Italian and Spanish", "French and Swiss", "Polish and Russian"], subjectType: 'gastronomy', subjectName: 'Patagonian Cuisine' },
+                    { q: "Which of these is NOT a key ingredient in Empanadas Mendocinas?", a: "Potato", o: ["Ground beef", "Onions", "Hard-boiled egg"], subjectType: 'dish', subjectName: 'Empanadas Mendocinas' },
+                    { q: "The most iconic gastronomic experience in Argentina is:", a: "A social asado", o: ["A formal wine tasting dinner", "A quick street-food meal", "A multi-course seafood feast"], subjectType: 'gastronomy', subjectName: 'Asado' },
+                    { q: "A crisp, high-altitude Chardonnay from Mendoza would pair well with what?", a: "Lighter chicken dishes or humita", o: ["Heavy beef stew like locro", "Spicy empanadas salteñas", "Fernet con Coca"], subjectType: 'wine_pairing', subjectName: 'Chardonnay Pairings' },
+                    { q: "The unofficial national cocktail of Argentina is:", a: "Fernet con Coca", o: ["Malbec and Coke (Kalimotxo)", "Pisco Sour", "Caipirinha"], subjectType: 'beverage', subjectName: 'Fernet con Coca' },
+                    { q: "Which of these is a key ingredient in the cuisine of Cuyo?", a: "High-quality grass-fed beef", o: ["Llama meat", "King crab", "Coconut milk"], subjectType: 'ingredient', subjectName: 'Cuyo Ingredients' },
+                    { q: "What is the typical cooking method for Cordero al Palo?", a: "Slow-roasted vertically over an open fire", o: ["Braised in a clay pot", "Quickly grilled over high heat", "Smoked for many hours"], subjectType: 'dish', subjectName: 'Cordero al Palo' },
+                    { q: "The broader beverage culture of Argentina includes wine, craft beer, and a national obsession with what?", a: "An Italian amaro", o: ["A German lager", "A Scottish whisky", "A Russian vodka"], subjectType: 'beverage', subjectName: 'Fernet' },
+                    { q: "Which fruit is native to Patagonia and used in sauces and desserts?", a: "Calafate berry", o: ["Açaí berry", "Guava", "Passionfruit"], subjectType: 'ingredient', subjectName: 'Calafate Berry' },
+                    { q: "The intensely flavored tomatoes and corn of Cuyo benefit from what?", a: "High-altitude farms", o: ["Heavy rainfall", "Coastal breezes", "Volcanic soils"], subjectType: 'ingredient', subjectName: 'Cuyo Ingredients' },
+                    { q: "What is 'locro' primarily made from?", a: "Hominy corn", o: ["Wheat flour", "Rice", "Potatoes"], subjectType: 'dish', subjectName: 'Locro' },
+                    { q: "The emerging craft spirit scene in Argentina is notable for using:", a: "Unique Argentine botanicals", o: ["Imported neutral grain spirit", "Traditional European recipes", "Artificial flavorings"], subjectType: 'spirit', subjectName: 'Argentine Craft Spirits' },
+                    { q: "What does the term 'gastronomy' refer to?", a: "The practice or art of choosing, cooking, and eating good food", o: ["The science of fermentation", "The study of agriculture", "The business of restaurant management"], subjectType: 'gastronomy', subjectName: 'Gastronomy' },
+                    { q: "Which wine would best complement the rich, gamey flavor of Cordero al Palo?", a: "A structured Malbec or Merlot from Patagonia", o: ["A light and aromatic Torrontés", "A sweet dessert wine", "A crisp sparkling wine"], subjectType: 'wine_pairing', subjectName: 'Lamb and Red Wine' },
+                    { q: "The social importance of the 'asado' is comparable to what event in the United States?", a: "A backyard barbecue", o: ["A formal Thanksgiving dinner", "A quick business lunch", "A tailgate party"], subjectType: 'gastronomy', subjectName: 'Asado' },
+                    { q: "The cuisine of which region is most distinct from the others due to its climate and immigrant history?", a: "Patagonia", o: ["Cuyo", "The North", "They are all very similar"], subjectType: 'gastronomy', subjectName: 'Patagonian Cuisine' },
+                    { q: "A 'bodega' in Argentina is a winery, but what is a 'parrilla'?", a: "A steakhouse", o: ["A vineyard", "A wine bar", "A bakery"], subjectType: 'gastronomy', subjectName: 'Parrilla' },
+                    { q: "What is the key textural difference between empanadas mendocinas and salteñas?", a: "Mendocinas are baked, Salteñas are often fried or baked but juicier", o: ["Mendocinas are always fried, Salteñas are always baked", "There is no difference", "Mendocinas use corn flour, Salteñas use wheat flour"], subjectType: 'dish', subjectName: 'Empanadas' }
+                ]
+            },
+            critic: {
+                title: "The Critic's Corner",
+                instructions: "Answer 10 multiple-choice questions about the vintages, producers, and market context of Argentina. After a correct answer, you may have the option to generate an AI tasting note.",
+                questions: [
+                    { q: "Which producer is considered the undisputed leader and pioneer of modern Argentine wine?", a: "Catena Zapata", o: ["Trivento", "Zuccardi", "Viña Cobos"], subjectType: 'producer', subjectName: 'Catena Zapata' },
+                    { q: "Which Argentine vintage received its first 100-point score and is known for balanced, structured wines?", a: "2013", o: ["2012", "2011", "2014"], subjectType: 'vintage', subjectName: '2013 Argentina Vintage' },
+                    { q: "Which winery is a partnership between Terrazas de los Andes (LVMH) and a prestigious Bordeaux Château?", a: "Cheval des Andes", o: ["Bodega Aleanna", "Clos de Siete", "Bodega Chacra"], subjectType: 'producer', subjectName: 'Cheval des Andes' },
+                    { q: "The 'Adrianna Vineyard', planted at nearly 1,500 meters, is the iconic high-altitude site of which producer?", a: "Catena Zapata", o: ["Viña Cobos", "Zuccardi", "Bemberg Estate Wines"], subjectType: 'place', subjectName: 'Adrianna Vineyard' },
+                    { q: "How are the hot and dry years like 2020 and 2017 generally characterized?", a: "Ripe, powerful, and concentrated wines", o: ["Fresh, elegant wines with high acidity", "Irregular wines lacking concentration", "Balanced and structured wines"], subjectType: 'vintage', subjectName: 'Hot Vintages in Argentina' },
+                    { q: "Which influential American winemaker founded Viña Cobos, known for its powerful, opulent Malbecs?", a: "Paul Hobbs", o: ["Michel Rolland", "Robert Mondavi", "Randall Grahm"], subjectType: 'producer', subjectName: 'Viña Cobos' },
+                    { q: "Which producer, led by Piero Incisa della Rocchetta of Sassicaia fame, has redefined Patagonian Pinot Noir?", a: "Bodega Chacra", o: ["Catena Zapata", "Trivento", "Durigutti"], subjectType: 'producer', subjectName: 'Bodega Chacra' },
+                    { q: "The 2016 vintage, influenced by El Niño, was exceptionally cool and wet, producing what style of wines?", a: "Very fresh, aromatic, and elegant with high acidity", o: ["Rich, ripe, and fruit-forward", "Powerful and concentrated", "Unbalanced and weak"], subjectType: 'vintage', subjectName: '2016 Argentina Vintage' },
+                    { q: "Bodega Aleanna, producer of 'El Enemigo', is a partnership between a head winemaker and a historian from which iconic family?", a: "Catena", o: ["Zuccardi", "Millán", "Hobbs"], subjectType: 'producer', subjectName: 'Bodega Aleanna (El Enemigo)' },
+                    { q: "Which 'Rising Star' has earned top awards for its work with heritage Criolla Chica vines in Las Compuertas?", a: "Durigutti Family Winemakers", o: ["Catena Zapata", "Bemberg Estate Wines", "Bodega Chacra"], subjectType: 'producer', subjectName: 'Durigutti Family Winemakers' },
+                    { q: "Which winery's 'Golden Reserve Malbec' is frequently cited by critics as a benchmark for value?", a: "Trivento", o: ["Cheval des Andes", "Viña Cobos", "Catena Zapata"], subjectType: 'producer', subjectName: 'Trivento' },
+                    { q: "The 2018 and 2019 vintages are considered 'Excellent' for what reason?", a: "They were balanced and stable without extremes", o: ["They were exceptionally hot and dry", "They were very cool and wet", "They produced historically low yields"], subjectType: 'vintage', subjectName: '2018/2019 Argentina Vintages' },
+                    { q: "Which 'Rising Star' quickly rose to the top with 'Best in Show' awards for its powerful red wines from Gualtallary?", a: "Bemberg Estate Wines", o: ["Bodega Aleanna", "Durigutti", "Swinney"], subjectType: 'producer', subjectName: 'Bemberg Estate Wines' },
+                    { q: "The critical consensus on Argentine wine is that the narrative has shifted from power and ripeness to:", a: "Elegance, freshness, and terroir-specificity", o: ["Even greater power and extraction", "Sweetness and high alcohol", "Simple, fruity, and unoaked styles"], subjectType: 'wine_style', subjectName: 'Modern Argentine Wine Style' },
+                    { q: "Which vintage was challenging due to severe spring frosts that reduced yields?", a: "2022", o: ["2021", "2019", "2018"], subjectType: 'vintage', subjectName: '2022 Argentina Vintage' },
+                    { q: "The Zuccardi family's 'Q' range is noted as a 'Value Champion' for delivering what?", a: "Excellent, terroir-expressive wines at a reasonable price", o: ["The most powerful and oaked wines in Argentina", "Entry-level bulk wines", "Exclusively white and rosé wines"], subjectType: 'producer', subjectName: 'Zuccardi' },
+                    { q: "Which Bordeaux blend was the first Argentine luxury cuvée to be benchmarked against the world's finest wines?", a: "Nicolás Catena Zapata", o: ["Cheval des Andes", "Cobos Malbec", "Unus"], subjectType: 'wine', subjectName: 'Nicolás Catena Zapata (Wine)' },
+                    { q: "The 2021 vintage is considered one of the best recent vintages for which grape variety in particular?", a: "Cabernet Sauvignon", o: ["Bonarda", "Torrontés", "Criolla Chica"], subjectType: 'vintage', subjectName: '2021 Argentina Vintage' },
+                    { q: "The initial phase of the quality revolution in the 1990s was overwhelmingly a ____-based model.", a: "Producer- and brand-", o: ["Terroir- and place-", "Government- and regulation-", "Cooperative- and volume-"], subjectType: 'wine_style', subjectName: '1990s Quality Revolution' },
+                    { q: "Which vintages are described as 'Challenging & Irregular' where quality is winemaker-dependent?", a: "2022, 2015, 2014", o: ["2021, 2016, 2013", "2019, 2018, 2011", "2020, 2017, 2012"], subjectType: 'vintage', subjectName: 'Challenging Vintages in Argentina' },
+                    { q: "Which producer is an iconic, historic estate but not part of the 'Value Champions' or 'Rising Stars' categories?", a: "Cheval des Andes", o: ["Trivento", "Bodega Aleanna", "Durigutti Family Winemakers"], subjectType: 'producer', subjectName: 'Cheval des Andes' },
+                    { q: "The modern 'terroir-based hierarchy' seeks to define quality based on what?", a: "Unique geological and climatic conditions", o: ["The producer's reputation", "The price of the wine", "The age of the vines"], subjectType: 'wine_style', subjectName: 'Terroir-Based Hierarchy' },
+                    { q: "Which vintage was accelerated by the onset of the COVID-19 pandemic?", a: "2020", o: ["2019", "2021", "2018"], subjectType: 'vintage', subjectName: '2020 Argentina Vintage' },
+                    { q: "The 'Mundus Bacillus Terrae' and 'River Stones' are single-parcel Malbecs from which famous vineyard?", a: "Adrianna Vineyard", o: ["Nicasia Vineyard", "Angelica Vineyard", "Domingo Vineyard"], subjectType: 'place', subjectName: 'Adrianna Vineyard' },
+                    { q: "The 'First Revolution' by Nicolás Catena involved introducing what winemaking technique?", a: "Non-oxidative, temperature-controlled winemaking", o: ["High-altitude planting", "Use of concrete eggs", "Organic and biodynamic farming"], subjectType: 'producer', subjectName: 'Catena Zapata' },
+                    { q: "Which two producers are considered the top 'Iconic Producers' that defined the quality revolution?", a: "Catena Zapata and Cheval des Andes", o: ["Trivento and Zuccardi", "Durigutti and Bemberg", "Bodega Chacra and Viña Cobos"], subjectType: 'producer', subjectName: 'Iconic Producers of Argentina' },
+                    { q: "Which vintage is noted for being cool and long, producing wines with great balance and aging potential?", a: "2013", o: ["2012", "2017", "2020"], subjectType: 'vintage', subjectName: '2013 Argentina Vintage' },
+                    { q: "Which wine critic has emphasized the industry's 'search for terroir' as the defining story of the modern era?", a: "The Wine Advocate", o: ["Vinous", "Jancis Robinson", "Decanter"], subjectType: 'wine_style', subjectName: 'Modern Argentine Wine Style' },
+                    { q: "Who is the influential Bordeaux consultant associated with the 'Clos de Siete' project?", a: "Michel Rolland", o: ["Paul Hobbs", "Émile Peynaud", "Denis Dubourdieu"], subjectType: 'producer', subjectName: 'Michel Rolland' },
+                    { q: "Which 'Value Champion' offers remarkable complexity that far exceeds its price?", a: "Bodega Aleanna (El Enemigo)", o: ["Viña Cobos", "Cheval des Andes", "Bodega Chacra"], subjectType: 'producer', subjectName: 'Bodega Aleanna (El Enemigo)' },
+                    { q: "The shift towards high-altitude planting was part of Catena's '_____ Revolution'.", a: "Second", o: ["First", "Third", "Final"], subjectType: 'producer', subjectName: 'Catena Zapata' },
+                    { q: "The 2015 and 2014 vintages were challenging due to what weather pattern?", a: "El Niño, bringing high rainfall and cooler temperatures", o: ["La Niña, bringing extreme heat and drought", "The Zonda wind being unusually strong", "Severe, widespread frost"], subjectType: 'vintage', subjectName: 'Challenging Vintages in Argentina' },
+                    { q: "Which Patagonian producer is considered a benchmark for old-vine Pinot Noir and Chardonnay?", a: "Bodega Chacra", o: ["Bemberg Estate Wines", "Durigutti", "Trivento"], subjectType: 'producer', subjectName: 'Bodega Chacra' },
+                    { q: "Which critic highlighted the 'vast evolution...to much fresher more graceful' Argentine wines?", a: "Jancis Robinson", o: ["Robert Parker", "James Suckling", "Antonio Galloni"], subjectType: 'wine_style', subjectName: 'Modern Argentine Wine Style' },
+                    { q: "The 2012 vintage is generally described as producing what style of wines?", a: "Rich, ripe, and fruit-forward", o: ["Fresh, elegant, and complex", "Lighter and lacking concentration", "Structured with high acidity"], subjectType: 'vintage', subjectName: '2012 Argentina Vintage' },
+                    { q: "Which iconic wine is a Malbec-Cabernet Sauvignon blend?", a: "Cheval des Andes", o: ["El Enemigo Chardonnay", "Cobos Marchiori Estate Malbec", "Mundus Bacillus Terrae"], subjectType: 'wine', subjectName: 'Cheval des Andes' },
+                    { q: "Which of these vintages is rated 'Excellent' and recommended to 'Hold'?", a: "2019", o: ["2017", "2015", "2012"], subjectType: 'vintage', subjectName: '2019 Argentina Vintage' },
+                    { q: "The inaugural vintage of Nicolás Catena Zapata was what year?", a: "1997", o: ["1982", "1990", "2001"], subjectType: 'wine', subjectName: 'Nicolás Catena Zapata (Wine)' },
+                    { q: "What is the primary factor that makes Argentina's development a 'compressed evolution'?", a: "Using modern science to reverse-engineer terroir in a short time", o: ["The rapid influx of foreign investment", "The government's five-year plan for wine quality", "The sudden discovery of very old vines"], subjectType: 'wine_style', subjectName: 'Modern Argentine Wine Style' },
+                    { q: "The 2011 vintage is described as producing wines that are:", a: "Concentrated, balanced, and elegant", o: ["Ripe, powerful, and accessible", "Lighter and fresher in style", "Very fresh with high acidity"], subjectType: 'vintage', subjectName: '2011 Argentina Vintage' },
+                    { q: "Which of these is NOT an 'Iconic Producer'?", a: "Zuccardi", o: ["Catena Zapata", "Cheval des Andes", "Viña Cobos"], subjectType: 'producer', subjectName: 'Zuccardi' },
+                    { q: "The modern quality revolution was primarily driven by:", a: "The vision of key producers", o: ["Government regulation", "Consumer demand for cheap wine", "The national university system"], subjectType: 'wine_style', subjectName: '1990s Quality Revolution' },
+                    { q: "Which vintage produced wines of 'sublime balance and equilibrium'?", a: "2021", o: ["2020", "2022", "2017"], subjectType: 'vintage', subjectName: '2021 Argentina Vintage' },
+                    { q: "The defining story of modern Argentine wine, according to The Wine Advocate, is:", a: "The search for terroir", o: ["The mastery of Malbec", "The increase in exports", "The revival of Criolla grapes"], subjectType: 'wine_style', subjectName: 'Modern Argentine Wine Style' },
+                    { q: "Which vintage is described as 'generous, accessible wines with good freshness'?", a: "2018", o: ["2016", "2017", "2020"], subjectType: 'vintage', subjectName: '2018 Argentina Vintage' },
+                    { q: "Which 'Value Champion' has a name that translates to 'The Enemy'?", a: "Bodega Aleanna (El Enemigo)", o: ["Trivento", "Zuccardi", "Durigutti"], subjectType: 'producer', subjectName: 'Bodega Aleanna (El Enemigo)' },
+                    { q: "The pioneering of high-altitude viticulture is considered Catena's '____ Revolution'.", a: "Second", o: ["First", "Third", "Final"], subjectType: 'producer', subjectName: 'Catena Zapata' },
+                    { q: "In the producer hierarchy, which category represents dynamic, often younger, producers pushing boundaries?", a: "Rising Stars", o: ["Iconic Producers", "Value Champions", "Historic Estates"], subjectType: 'producer', subjectName: 'Argentine Producer Hierarchy' },
+                    { q: "Which of these is considered a 'Hot, Dry & Powerful Year'?", a: "2017", o: ["2016", "2013", "2021"], subjectType: 'vintage', subjectName: 'Hot Vintages in Argentina' },
+                    { q: "Who is widely credited as the central figure of the producer- and brand-based era?", a: "Nicolás Catena Zapata", o: ["Michel Rolland", "Paul Hobbs", "Alejandro Vigil"], subjectType: 'producer', subjectName: 'Nicolás Catena Zapata' }
+                ]
+            },
+        };
+
+
+
+
+        // This new object contains comprehensive flashcard data, separate from the quiz questions
+        const flashcardData = {
+            historian: [
+                { q: "When was viticulture first introduced to Argentina by Spanish colonists?", a: "Mid-16th century" },
+                { q: "The first recorded commercial vineyard was established in what year and city?", a: "1557 in Santiago del Estero" },
+                { q: "What was the name of the French agronomist who introduced Malbec to Argentina?", a: "Michel Aimé Pouget" },
+                { q: "What is the date now celebrated as 'World Malbec Day', marking the approval of the Quinta Agronómica de Mendoza?", a: "April 17, 1853" },
+                { q: "What invention's arrival in the 19th century connected Mendoza to Buenos Aires and catalyzed the wine industry?", a: "The railway" },
+                { q: "The 20th century was largely defined by a focus on what type of wine production?", a: "High-volume, low-quality wine for the domestic market ('jug wine')" },
+                { q: "Who is the key figure credited with leading the modern quality revolution in the early 1980s?", a: "Nicolás Catena Zapata" },
+                { q: "What landmark legislation in 1999 formally codified Argentina's three-tier appellation system?", a: "Law 25.163" },
+                { q: "What was the first Argentine luxury cuvée to be exported and benchmarked against world-class wines?", a: "Nicolás Catena Zapata (1997 vintage)" },
+                { q: "The approval of which IG in 2013 marked a fundamental shift to science-based, terroir-driven appellations?", a: "Paraje Altamira IG" },
+                { q: "Which urban winery, founded in 1922, is a monument to the 'Golden Age' of Argentine viticulture?", a: "Bodega Los Toneles" },
+                { q: "The Frank Romero Day Amphitheater is the official venue for what major annual celebration?", a: "Fiesta Nacional de la Vendimia (National Grape Harvest Festival)" },
+                { q: "What event in 1861 destroyed the city of Mendoza, leading to a new city plan centered on Plaza Independencia?", a: "A devastating earthquake" },
+                { q: "Argentina's quality evolution is considered a 'compressed evolution' because it used modern science to do what?", a: "To reverse-engineer the concept of terroir in a matter of years, not centuries." },
+                { q: "What was the primary reason Jesuit missionaries first required wine in Argentina?", a: "For sacramental purposes" },
+                { q: "Which high-yielding grape was favored during the early colonial period?", a: "Criolla Grande" },
+                { q: "What two immigrant groups were most significant in the 19th-century expansion of the wine industry?", a: "Spanish and Italian immigrants" },
+                { q: "What was the 'Quinta Agronómica de Mendoza'?", a: "A nursery and agricultural school" },
+                { q: "The quality revolution of the 1980s and 90s was spurred by neoliberal economic policies that did what?", a: "Opened international markets for export" },
+                { q: "Was the legal framework the cause of the quality revolution or a result of it?", a: "A result of it (a lagging indicator)" },
+                { q: "What American wine region inspired Nicolás Catena Zapata's quality revolution?", a: "Napa Valley" },
+                { q: "The Catena family's 'First Revolution' was the introduction of what?", a: "Non-oxidative, temperature-controlled winemaking techniques" },
+                { q: "The Catena family's 'Second Revolution' was the pioneering exploration of what?", a: "High-altitude viticulture in the Uco Valley" },
+                { q: "Which influential Bordeaux consultant is associated with the Clos de Siete project?", a: "Michel Rolland" },
+                { q: "Which influential Napa winemaker is associated with the Viña Cobos project?", a: "Paul Hobbs" },
+                { q: "The boundaries of Paraje Altamira were delineated by studying the alluvial cone of which river?", a: "The Tunuyán River" },
+                { q: "Bodega Los Toneles was declared a 'Cultural Heritage of the province of Mendoza' in what year?", a: "2008" },
+                { q: "Who designed the Parque General San Martín in 1896?", a: "Carlos Thays" },
+                { q: "Plaza Independencia symbolizes the resilience and modern identity of which city?", a: "Mendoza" },
+                { q: "The 'Criolla Revival' movement gained official validation when the INV recognized Criolla Chica as a quality grape in what year?", a: "August 2024" },
+                { q: "What was Argentina's first DOC, established in 1989?", a: "Luján de Cuyo DOC" },
+                { q: "The San Rafael DOC was approved in what year?", a: "2007" },
+                { q: "The Milan-based company Fratelli Branca opened its Buenos Aires distillery in what year?", a: "1941" },
+                { q: "In the 1990s and early 2000s, what was the primary indicator of quality for international consumers?", a: "The producer's name on the label" },
+                { q: "How many soil pits were dug to map the distinct soils of Paraje Altamira?", a: "Over 200" },
+                { q: "San Pablo IG and Pampa El Cepillo IG had their boundaries defined by what factors?", a: "Geographical and climatic factors, not political lines" },
+                { q: "The architecture of Bodega Los Toneles was inspired by what?", a: "The Industrial Revolution" },
+                { q: "Since what year has the Frank Romero Day Amphitheater been the venue for the Vendimia festival?", a: "1936" },
+                { q: "The shift to a terroir-based hierarchy moves focus from the producer's name to what?", a: "The name of a specific place" },
+                { q: "What is the historical path of Argentina's wine industry evolution?", a: "Colonial necessity -> immigrant expansion -> high-volume domestic -> modern quality focus -> terroir-driven identity" }
+            ],
+            terroir: [
+                { q: "What is the dominant geological feature defining Argentina's wine regions?", a: "The Andes Mountains" },
+                { q: "What term describes the vast fans of eroded sediment carried by rivers from the Andes?", a: "Alluvial fans" },
+                { q: "What is the critical, prized soil component in high-altitude Uco Valley vineyards?", a: "Calcium carbonate (limestone)" },
+                { q: "What is the local term for soil pits used for vineyard analysis?", a: "Calicatas" },
+                { q: "In Argentina's arid climate, which soil property is more important than chemical fertility?", a: "Water-holding capacity" },
+                { q: "What is the name of the hot, dry foehn wind affecting the Cuyo region?", a: "Zonda" },
+                { q: "What is the main viticultural risk in Mendoza, often mitigated by nets?", a: "Hail (Granizo)" },
+                { q: "What is the inverse relationship between latitude and altitude in Argentina?", a: "As latitude decreases (closer to equator), altitude must increase for quality viticulture." },
+                { q: "Which region requires the highest altitudes (up to 3,329m)?", a: "The North (Salta)" },
+                { q: "Which region achieves a cool climate at low altitudes (~300m)?", a: "Patagonia" },
+                { q: "What is the general climate type of Argentina's wine regions?", a: "Continental and semi-arid" },
+                { q: "Why is organic viticulture relatively easy in Argentina?", a: "The arid climate minimizes fungal disease pressure." },
+                { q: "What natural phenomenon is the primary source of irrigation water?", a: "Andean snowmelt" },
+                { q: "What is a major viticultural risk in both high-altitude sites and Patagonia?", a: "Frost" },
+                { q: "What is the approximate latitude of Mendoza?", a: "~33°S" },
+                { q: "What is the approximate latitude of Salta (Cafayate)?", a: "~26°S" },
+                { q: "What is the approximate latitude of Río Negro, Patagonia?", a: "~39°S" },
+                { q: "How do soils in lower-altitude areas like Maipú differ from high-altitude Uco Valley soils?", a: "They are generally deeper with more clay and silt." },
+                { q: "What effect do limestone soils have on wines?", a: "They restrict vigor and produce wines with enhanced structure, freshness, and mineral texture." },
+                { q: "What effect do deeper, more fertile soils have on wines?", a: "They produce richer, more powerful wines with rounder tannins." },
+                { q: "What is the national body for geological study?", a: "SEGEMAR (Servicio Geológico Minero Argentino)" },
+                { q: "What is the defining climatic feature of Patagonia?", a: "Persistent strong winds" },
+                { q: "What is the defining climatic feature of Salta?", a: "Extreme altitude and intense solar radiation" },
+                { q: "What is the average annual precipitation in the Uco Valley?", a: "~250 mm" },
+                { q: "High altitude and intense sun promote the development of what in grapes?", a: "Thicker skins with more polyphenols" },
+                { q: "What does 'diurnal range' mean?", a: "The difference between daytime high and nighttime low temperatures." },
+                { q: "The Uco Valley's soils are primarily alluvial deposits from which river?", a: "The Tunuyán River" },
+                { q: "What does controlled water stress, achieved in shallow stony soils, lead to?", a: "Smaller berries with greater concentration" },
+                { q: "Which macro-region accounts for the vast majority of production?", a: "Cuyo (Mendoza, San Juan, La Rioja)" },
+                { q: "What is the primary topographical feature of all of Argentina's wine regions?", a: "They are in the foothills of the Andes (the Cordillera)." },
+                { q: "A 'chalky' texture in wine is associated with which soil type?", a: "Calcareous soils (limestone)" },
+                { q: "What is the parent rock material for most Argentine vineyards?", a: "It's not a single bedrock, but a mix of eroded Andean sediment." },
+                { q: "How does the Zonda wind affect vines?", a: "It can cause rapid temperature rises and dehydration/heat stress." },
+                { q: "Which region has a subtropical mountainous climate?", a: "The North (Salta)" },
+                { q: "Which region has a desert climate with four distinct seasons?", a: "Cuyo (Mendoza)" },
+                { q: "Which region has a high latitude, low altitude desert climate?", a: "Patagonia" },
+                { q: "What is 'granizo'?", a: "Hail" },
+                { q: "The extreme heterogeneity of soils means that soil types can vary significantly over...", a: "Very short distances" },
+                { q:t: "What is the primary component of high-altitude alluvial soils?", a: "Shallow, stony, poor in organic matter, with excellent drainage." },
+                { q: "Why is mapping 'calicatas' so important for modern viticulture?", a: "It allows for precision irrigation based on specific soil profiles." }
+            ],
+            ampelographer: [
+                { q: "What is the genetic parentage of Malbec?", a: "Magdeleine Noire des Charentes (mother) and Prunelard (father)" },
+                { q: "What is the French name for Malbec, particularly in Cahors?", a: "Côt" },
+                { q: "What is the genetic parentage of Torrontés Riojano?", a: "Muscat of Alexandria and Criolla Chica (Mission)" },
+                { q: "What is the true identity of the grape called Bonarda in Argentina?", a: "Douce Noir, from Savoie, France" },
+                { q: "What is the traditional high pergola vine training system called?", a: "Parral Cuyano" },
+                { q: "What is the modern standard for vine training in quality production?", a: "Vertical Shoot Positioning (VSP)" },
+                { q: "What makes Argentina's Malbec plant material genetically diverse and significant?", a: "It is pre-phylloxera material that has adapted locally for over 150 years." },
+                { q: "Which of the three Torrontés varieties is of the highest quality?", a: "Torrontés Riojano" },
+                { q: "What is the most common modern irrigation method?", a: "Drip irrigation" },
+                { q: "What is the traditional irrigation method using ditches called?", a: "Flood irrigation (using 'acequias')" },
+                { q: "What is the 'Criolla Revival'?", a: "A movement to craft high-quality wines from heritage grapes like Criolla Chica." },
+                { q: "Which national institute researches and certifies grape clones?", a: "INTA (Instituto Nacional de Tecnología Agropecuaria)" },
+                { q: "How do Argentine Malbec biotypes often differ from modern French clones?", a: "They have smaller berries and clusters, producing wines with softer tannins." },
+                { q: "What does 'coulure' mean, a condition to which Malbec is susceptible?", a: "Poor fruit set after flowering" },
+                { q: "What is the signature floral aroma of high-altitude Malbec?", a: "Violet" },
+                { q: "What is the signature floral aroma of Torrontés Riojano?", a: "Rose petals, jasmine, and geranium" },
+                { q: "Which grape's true identity is also known as Charbono in California?", a: "Bonarda (Douce Noir)" },
+                { q: "Which grape, recently recognized for quality, is also called Mission or Listán Prieto?", a: "Criolla Chica" },
+                { q: "What is the primary benefit of the VSP system?", a: "It allows for precise canopy management, better sun exposure control, and mechanization." },
+                { q: "Which white grape is one of the most planted but mainly used for bulk wine?", a: "Pedro Giménez" },
+                { q: "Which red grape has become a star in cool, high-altitude sites, praised by critics like Jancis Robinson?", a: "Cabernet Franc" },
+                { q: "Despite its perfumed nose, how is Torrontés Riojano typically vinified?", a: "Dry" },
+                { q: "High-altitude sun exposure helps Malbec develop thick skins rich in what compounds?", a: "Anthocyanins and polyphenols" },
+                { q: "Which region is most famous for producing high-quality Torrontés Riojano?", a: "Salta" },
+                { q: "What was the primary purpose of the Parral Cuyano system?", a: "To facilitate flood irrigation and protect high yields from intense sun." },
+                { q: "Yield limits (e.g., <10 tons/ha) are only legally mandated in what designation?", a: "DOC (like Luján de Cuyo)" },
+                { q: "The re-evaluation of old-vine Semillón and Chenin Blanc is for producing what style of wine?", a: "Complex, age-worthy white wines" },
+                { q: "What is the father of Torrontés Riojano?", a: "Criolla Chica" },
+                { q: "What is the father of Malbec?", a: "Prunelard" },
+                { q: "What are the three genetically distinct Torrontés varieties?", a: "Torrontés Riojano, Torrontés Sanjuanino, and Torrontés Mendocino" },
+                { q: "Malbec requires significant sun and heat to fully mature its...", a: "Tannins" },
+                { q: "A characteristic of Torrontés on the palate is a subtle hint of what on the finish?", a: "Bitterness" },
+                { q: "What are common fruit descriptors for Malbec from warmer, lower-altitude sites?", a: "Ripe dark fruits like plum and blackberry" },
+                { q: "What are common fruit descriptors for Malbec from cooler, high-altitude sites?", a: "Fresh red and black fruit notes" },
+                { q: "What is a 'varietal' wine in Argentina?", a: "A wine named after its primary grape variety." },
+                { q: "Are there national regulations for planting density?", a: "No, practices vary widely." },
+                { q: "The sophisticated canal systems for irrigation date back to which indigenous people?", a: "The Huarpe" },
+                { q: "Which grape is the second most planted red variety in Argentina?", a: "Bonarda (Douce Noir)" },
+                { q: "Which of these is NOT a major red grape in Argentina: Syrah, Merlot, or Sangiovese?", a: "Sangiovese" },
+                { q: "Which of these is a major white grape in Argentina: Chardonnay, Riesling, or Sauvignon Blanc?", a: "All three are grown, but Chardonnay is the most significant of the three." }
+            ],
+            lawmaker: [
+                { q: "What is the 1999 law that established the modern quality system?", a: "Law 25.163" },
+                { q: "What are the three tiers of the Argentine wine designation system?", a: "Indicación de Procedencia (IP), Indicación Geográfica (IG), and Denominación de Origen Controlada (DOC)" },
+                { q: "What is the highest and strictest classification?", a: "Denominación de Origen Controlada (DOC)" },
+                { q: "What is the minimum percentage for a single varietal wine?", a: "85%" },
+                { q: "What is the minimum aging for a red 'Reserva' wine?", a: "12 months" },
+                { q: "What is the minimum aging for a red 'Gran Reserva' wine?", a: "24 months" },
+                { q: "What is the national governing body for wine?", a: "Instituto Nacional de Vitivinicultura (INV)" },
+                { q: "What was Argentina's first DOC?", a: "Luján de Cuyo DOC" },
+                { q: "The Luján de Cuyo DOC is specifically for which grape variety?", a: "Malbec" },
+                { q: "What does an Indicación Geográfica (IG) primarily guarantee?", a: "Geographical origin" },
+                { q: "What is the broadest geographical designation?", a: "Indicación de Procedencia (IP)" },
+                { q: "The approval of which IG marked a shift to science-based (terroir) appellations?", a: "Paraje Altamira IG" },
+                { q: "What is the minimum aging for a white/rosé 'Reserva'?", a: "6 months" },
+                { q: "What is the minimum aging for a white/rosé 'Gran Reserva'?", a: "12 months" },
+                { q: "What is the name of the local regulatory body for a DOC?", a: "Consejo de Promoción (Promotion Council)" },
+                { q: "Is chaptalization (adding sugar to must) a permitted practice in Argentina?", a: "No, it is unnecessary and not featured." },
+                { q: "Is acidification a permitted practice?", a: "Yes, it is a common and permitted practice to ensure balance." },
+                { q: "The 'Primera Zona' (First Zone) refers to which two departments?", a: "Luján de Cuyo and Maipú" },
+                { q: "What does the term 'Paraje' signify in an IG name?", a: "A specific, terroir-defined 'place' or 'spot' rather than a political district." },
+                { q: "The Valle de Uco IG encompasses which three departments?", a: "Tupungato, Tunuyán, and San Carlos" },
+                { q: "What is the Argentine term for a winery?", a: "Bodega" },
+                { q: "What is the Argentine term for the harvest or vintage year?", a: "Cosecha" },
+                { q: "What does 'Vino Tinto' mean?", a: "Red Wine" },
+                { q: "What does 'Vino Espumoso' mean?", a: "Sparkling Wine" },
+                { q: "What is the maximum yield mandated by the Luján de Cuyo DOC?", a: "Less than 10 tons per hectare" },
+                { q: "What is Argentina's second approved DOC?", a: "San Rafael DOC" },
+                { q: "The technical details for implementing Law 25.163 were provided in what document?", a: "Decreto 57/2004" },
+                { q: "Unlike the Old World, Argentina's legal system was a ____ indicator of the quality revolution.", a: "Lagging" },
+                { q: "Which department is NOT in the Cuyo macro-region: Mendoza, Salta, or San Juan?", a: "Salta" },
+                { q: "Which province is by far the most important, with over 75% of vineyards?", a: "Mendoza" },
+                { q: "The INV sets annual minimum alcohol levels, but which wines are exempt?", a: "Varietal, Reserva, or Gran Reserva wines" },
+                { q: "What is the legal sugar limit for an 'Extra Brut' sparkling wine?", a: "Up to 8 g/L" },
+                { q: "What is the legal sugar limit for a 'Brut' sparkling wine?", a: "Up to 14 g/L" },
+                { q: "What is the legal sugar limit for a 'Demi Sec' sparkling wine?", a: "Up to 25 g/L" },
+                { q: "As of 2024, what oenological practice is legal, allowing for up to a 20% reduction in ethanol?", a: "Partial dealcoholization" },
+                { q: "What is the most specific level in the official appellation hierarchy?", a: "Paraje (Place) Level IG" },
+                { q: "The district of Gualtallary is within which department IG?", a: "Tupungato" },
+                { q: "The district of Agrelo is within which department IG?", a: "Luján de Cuyo" },
+                { q: "The Paraje Altamira IG is within which department IG?", a: "San Carlos" },
+                { q: "The 'Oasis Sur' (Southern Oasis) sub-region includes which DOC?", a: "San Rafael" }
+            ],
+            gastronome: [
+                { q: "What is Argentina's unofficial national spirit, an Italian amaro?", a: "Fernet" },
+                { q: "How is Fernet most famously consumed in Argentina?", a: "Mixed with Coca-Cola (Fernet con Coca)" },
+                { q: "What is the 'asado'?", a: "The traditional Argentine barbecue, both the event and the grilled meats." },
+                { q: "What is the name of the iconic Patagonian dish of slow-roasted whole lamb?", a: "Cordero al Palo" },
+                { q: "What are Empanadas Mendocinas typically filled with?", a: "Spiced ground beef, onions, olives, and hard-boiled egg." },
+                { q: "What is 'Locro'?", a: "A thick, hearty stew of hominy corn, beans, squash, and meats." },
+                { q: "What is the classic Argentine sauce for grilled meat?", a: "Chimichurri" },
+                { q: "The cuisine of which region shows the strongest indigenous Andean influence?", a: "Salta and The North" },
+                { q: "The craft gin 'Principe de los Apostoles' uses which key Argentine botanical?", a: "Yerba mate" },
+                { q: "What is 'centolla', a specialty of Patagonia?", a: "King crab" },
+                { q: "A full-bodied Mendoza Malbec is the classic pairing for what?", a: "Asado (grilled beef)" },
+                { q: "An aromatic Salta Torrontés is a classic pairing for what?", a: "Spicy empanadas salteñas" },
+                { q: "What is a 'parrilla'?", a: "A steakhouse or the grill itself." },
+                { q: "What is 'humita en chala'?", a: "A savory, creamy pudding of fresh corn, steamed in its own husk." },
+                { q: "Llama and goat meat are traditional in the cuisine of which region?", a: "The North" },
+                { q: "What is the Calafate berry?", a: "A native Patagonian berry used in jams and sauces." },
+                { q: "What is 'ojo de bife'?", a: "A prized cut of beef (ribeye)." },
+                { q: "What does 'cerveza artesanal' mean?", a: "Craft beer" },
+                { q: "What is 'charqui'?", a: "Sun-dried meat, often used in Northern cuisine." },
+                { q: "What are Empanadas Salteñas known for being?", a: "Smaller and juicier than their Mendocinian counterparts." },
+                { q: "Which company is the primary producer of Fernet in Argentina?", a: "Fratelli Branca" },
+                { q: "An elegant Patagonian Pinot Noir is a great pairing for what local dish?", a: "Patagonian trout" },
+                { q: "The cuisine of Patagonia was influenced by immigrants from which two European nations?", a: "Wales and Germany" },
+                { q: "What is 'tomaticán'?", a: "A rustic, home-style stew from Cuyo made with tomato, onion, and egg." },
+                { q: "Guanaco and wild boar are game meats found in which region?", a: "Patagonia" },
+                { q: "What is the main ingredient of Locro?", a: "Hominy corn" },
+                { q: "Yatay Liqueur is made from the fruit of what?", a: "The native Butia Yatay palm" },
+                { q: "Which of these is NOT a key ingredient in Chimichurri: Parsley, Cilantro, or Garlic?", a: "Cilantro" },
+                { q: "Which region's cuisine is the heart of Argentine beef and wine culture?", a: "Mendoza and the Cuyo Region" },
+                { q: "Are Empanadas Mendocinas typically baked or fried?", a: "Baked" },
+                { q: "Which of these is NOT a key ingredient in Northern cuisine: Corn, Quinoa, or Olives?", a: "Olives" },
+                { q: "A 'bodega' is a winery. What is a vineyard called?", a: "Viñedo" },
+                { q: "What city is the civic and cultural center of Argentina's wine capital?", a: "Mendoza" },
+                { q: "Which brewery is a major player in the Argentine craft beer scene?", a: "Antares" },
+                { q: "What are 'tamales'?", a: "A traditional dish made of masa, steamed in a corn husk." },
+                { q: "A structured Cabernet Franc pairs well with what kind of food?", a: "Herbal or peppery dishes, and grilled meats." },
+                { q: "Argentina is the largest consumer of Fernet outside of what country?", a: "Italy" },
+                { q: "What is the most prized freshwater fish from Patagonia's rivers?", a: "Patagonian trout" },
+                { q: "Which of these is a key ingredient in Patagonian cuisine: Forest mushrooms or chili peppers?", a: "Forest mushrooms" },
+                { q: "What is the main difference between an asado and a parrillada?", a: "'Asado' is the overall event/technique, 'parrillada' often refers to a mixed grill platter." }
+            ],
+            critic: [
+                { q: "Who is the undisputed leader and pioneer of the modern Argentine quality revolution?", a: "Nicolás Catena Zapata" },
+                { q: "Which vintage is hailed as 'near-perfect' and received Argentina's first 100-point score?", a: "2013" },
+                { q: "Which iconic wine is a partnership between LVMH and Château Cheval Blanc?", a: "Cheval des Andes" },
+                { q: "Who founded Viña Cobos, known for powerful, opulent Malbecs?", a: "Paul Hobbs" },
+                { q: "Which producer, led by a member of the Sassicaia family, has redefined Patagonian Pinot Noir?", a: "Bodega Chacra" },
+                { q: "How are hot, dry vintages like 2017 and 2020 generally characterized?", a: "Ripe, full-bodied, and powerful" },
+                { q: "How are cool, wet vintages like 2016 described?", a: "Very fresh, aromatic, and elegant with high acidity" },
+                { q: "Which producer's 'El Enemigo' wines are considered a 'Value Champion' for their remarkable complexity?", a: "Bodega Aleanna" },
+                { q: "Which 'Rising Star' has won top awards for its heritage Criolla Chica?", a: "Durigutti Family Winemakers" },
+                { q: "Which winery's 'Golden Reserve Malbec' is a benchmark for value from Luján de Cuyo?", a: "Trivento" },
+                { q: "Which is the iconic high-altitude vineyard of Catena Zapata?", a: "Adrianna Vineyard" },
+                { q: "The 2018 and 2019 vintages are highly rated for being...", a: "Balanced, stable, and classic without extremes" },
+                { q: "Which 'Rising Star' earned 'Best in Show' awards for its powerful reds from Gualtallary?", a: "Bemberg Estate Wines" },
+                { q: "What is the name of Catena Zapata's flagship Bordeaux blend?", a: "Nicolás Catena Zapata" },
+                { q: "The critical consensus is that the style of Argentine wine has evolved from 'powerful' to what?", a: "Elegant, fresh, and terroir-specific" },
+                { q: "The 2022 vintage was challenging due to what major climatic event?", a: "Severe spring frosts that reduced yields" },
+                { q: "The Zuccardi family's 'Q' range is an example of what producer category?", a: "Value Champions" },
+                { q: "The 2021 vintage was considered exceptionally good for which red grape?", a: "Cabernet Sauvignon" },
+                { q: "Which of these is an 'Iconic Producer': Catena Zapata, Trivento, or Durigutti?", a: "Catena Zapata" },
+                { q: "The initial quality revolution of the 1990s was based on producer reputation and what else?", a: "Brand recognition" },
+                { q: "The 2014 and 2015 vintages were challenging due to what weather phenomenon?", a: "El Niño, which brought higher rainfall" },
+                { q: "The 'Mundus Bacillus Terrae' is a single-parcel wine from which vineyard?", a: "Adrianna Vineyard" },
+                { q: "The shift to a terroir-based hierarchy was exemplified by the creation of which IG?", a: "Paraje Altamira IG" },
+                { q: "Which vintage was notably accelerated by the onset of the COVID-19 pandemic?", a: "2020" },
+                { q: "Who is the influential Bordeaux consultant associated with Clos de Siete?", a: "Michel Rolland" },
+                { q: "The 'First Revolution' of Nicolás Catena was focused on what?", a: "Introducing modern, non-oxidative winemaking." },
+                { q: "The 'Second Revolution' of Nicolás Catena was focused on what?", a: "Pioneering high-altitude viticulture." },
+                { q: "Which of these producers is NOT located in Mendoza: Catena Zapata, Bodega Chacra, or Viña Cobos?", a: "Bodega Chacra (Patagonia)" },
+                { q: "What is the general drinking recommendation for hot year wines like 2012 and 2017?", a: "Drink now" },
+                { q: "What is the general drinking recommendation for balanced, excellent years like 2019 and 2021?", a: "Hold" },
+                { q: "What does 'drink/hold' mean in a vintage chart?", a: "The wine is enjoyable now but also has potential to improve with age." },
+                { q: "The modern era in Argentine wine is defined by the 'search for...' what?", a: "Terroir" },
+                { q: "Which critic noted the emergence of 'great precision for Argentinian white wines'?", a: "Vinous" },
+                { q: "The producer-led evolution of Argentina is a hallmark of many ____ World wine regions.", a: "New" },
+                { q: "What is the style of the 2011 vintage?", a: "Concentrated, balanced, and elegant" },
+                { q: "Which wine is NOT a flagship Catena Zapata wine: Nicolás Catena Zapata, Cheval des Andes, or Mundus Bacillus Terrae?", a: "Cheval des Andes" },
+                { q: "What makes Argentina's development a 'compressed evolution'?", a: "The use of modern science to accelerate the understanding of terroir." },
+                { q: "Which of these is NOT a 'Value Champion': Trivento, El Enemigo, or Viña Cobos?", a: "Viña Cobos" },
+                { q: "Which of these is NOT a 'Rising Star': Durigutti, Bemberg, or Cheval des Andes?", a: "Cheval des Andes" },
+                { q: "The producer hierarchy is based on critical consensus and what other factor?", a: "Market positioning" }
+            ]
+        };
+
+
+
+
+        const mainMenu = document.getElementById('main-menu');
+        const gameScreen = document.getElementById('game-screen');
+        const modalContainer = document.getElementById('modal-container');
+        const modalContentWrapper = document.getElementById('modal-content-wrapper');
+        const aiSettingsBtn = document.getElementById('ai-settings-btn');
+
+
+
+
+        let currentModule;
+        let currentQuestionIndex;
+        let score;
+        let questions = [];
+        let userTimeline = [];
+        let historianAvailableEvents = [];
+        let flashcardDeck = [];
+        let currentFlashcardIndex = 0;
+        let userApiKey = localStorage.getItem('geminiApiKey') || '';
+
+
+
+
+        // --- Event Listeners ---
+        document.querySelectorAll('.module-btn').forEach(button => {
+            button.addEventListener('click', () => {
+                const module = button.dataset.module;
+                if (module === 'flashcard') {
+                    showFlashcardTopicSelection();
+                } else {
+                    showInstructionalModal(module);
+                }
+            });
+        });
+
+
+
+
+        aiSettingsBtn.addEventListener('click', showAiSettingsModal);
+    	
+        // --- Modal Functions ---
+        function showModal(content) {
+            modalContentWrapper.innerHTML = content;
+            modalContainer.classList.remove('hidden');
+        }
+
+
+
+
+        function hideModal() {
+            modalContainer.classList.add('hidden');
+            modalContentWrapper.innerHTML = '';
+        }
+    	
+        function showWelcomeModal() {
+            if (sessionStorage.getItem('welcomed')) return;
+            const content = `
+                <div class="p-6">
+                    <h2 class="text-2xl font-bold mb-4 text-purple-400">Welcome to the Gauntlet!</h2>
+                    <p class="mb-4 text-gray-300">This is "Argentina: A Wine Master's Challenge," an interactive study game designed for advanced wine students.</p>
+                    <p class="mb-6 text-gray-300">Test your knowledge across history, terroir, grapes, law, and more. All questions are derived from a comprehensive research document on the region. Good luck!</p>
+                    <button onclick="closeWelcomeModal()" class="w-full bg-purple-700 hover:bg-purple-600 text-white font-bold py-2 px-4 rounded">Begin</button>
+                </div>
+            `;
+            showModal(content);
+        }
+
+
+
+
+        function closeWelcomeModal() {
+            sessionStorage.setItem('welcomed', 'true');
+            hideModal();
+        }
+
+
+
+
+        function showInstructionalModal(module) {
+            currentModule = module;
+            const moduleData = gameData[module];
+            const content = `
+                <div class="p-6">
+                    <h2 class="text-2xl font-bold mb-4 text-purple-400">${moduleData.title}</h2>
+                    <p class="mb-6 text-gray-300">${moduleData.instructions}</p>
+                    <button onclick="startGame()" class="w-full bg-purple-700 hover:bg-purple-600 text-white font-bold py-2 px-4 rounded">Start Challenge</button>
+                </div>
+            `;
+            showModal(content);
+        }
+
+
+
+
+        function showEndGameModal() {
+            const moduleData = gameData[currentModule];
+            const content = `
+                <div class="p-6 text-center">
+                    <h2 class="text-2xl font-bold mb-4 text-purple-400">Module Complete!</h2>
+                    <p class="text-lg mb-2 text-gray-300">You completed "${moduleData.title}".</p>
+                    <p class="text-4xl font-bold mb-6">Score: ${score} / ${questions.length}</p>
+                    <div class="flex space-x-4">
+                        <button onclick="startGame()" class="w-full bg-purple-700 hover:bg-purple-600 text-white font-bold py-2 px-4 rounded">Keep Going</button>
+                        <button onclick="returnToMenu()" class="w-full bg-gray-700 hover:bg-gray-600 text-white font-bold py-2 px-4 rounded">Main Menu</button>
+                    </div>
+                </div>
+            `;
+            showModal(content);
+        }
+
+
+
+
+        function showAiSettingsModal() {
+            const content = `
+                <div class="p-6">
+                    <div class="flex justify-between items-center mb-4">
+                        <h2 class="text-2xl font-bold text-purple-400">AI Settings</h2>
+                        <button onclick="hideModal()" class="text-gray-400 hover:text-white">&times;</button>
+                    </div>
+                    <p class="mb-4 text-gray-300">To use the AI-powered features, please enter your Google AI Studio API key. You can get a key at <a href="https://aistudio.google.com/app/apikey" target="_blank" class="text-purple-400 hover:underline">aistudio.google.com/app/apikey</a>.</p>
+                    <p class="text-sm text-yellow-400 mb-4">Security Reminder: Treat your API key like a password. It is saved in your browser's local storage for convenience but is not transmitted anywhere else.</p>
+                    <div class="mb-4">
+                        <label for="api-key-input" class="block text-sm font-medium text-gray-300 mb-1">Google AI API Key</label>
+                        <input type="password" id="api-key-input" class="w-full bg-gray-700 border border-gray-600 rounded px-3 py-2 text-white" value="${userApiKey}">
+                    </div>
+                    <button onclick="saveApiKey()" class="w-full bg-purple-700 hover:bg-purple-600 text-white font-bold py-2 px-4 rounded">Save and Close</button>
+                </div>
+            `;
+            showModal(content);
+        }
+    	
+        function saveApiKey() {
+            userApiKey = document.getElementById('api-key-input').value;
+            localStorage.setItem('geminiApiKey', userApiKey);
+            hideModal();
+        }
+
+
+
+
+        // --- Game Flow ---
+        function startGame() {
+            hideModal();
+            mainMenu.classList.add('hidden');
+            gameScreen.classList.remove('hidden');
+            score = 0;
+            currentQuestionIndex = 0;
+
+
+
+
+            if (currentModule === 'historian') {
+                questions = shuffleArray([...gameData.historian.questions]).slice(0, 5); // Historian has a fixed number of questions
+                loadHistorianQuestion();
+            } else {
+                const allModuleQuestions = [...gameData[currentModule].questions];
+                const correctLog = JSON.parse(localStorage.getItem('correctlyAnsweredQuestions')) || {};
+                const correctQuestionsForModule = correctLog[currentModule] || [];
+
+
+
+
+                let availableQuestions = allModuleQuestions.filter(q => !correctQuestionsForModule.includes(q.q));
+
+
+
+
+                if (availableQuestions.length === 0 && allModuleQuestions.length > 0) {
+                    const masteryContent = `
+                        <div class="p-6 text-center">
+                            <h2 class="text-2xl font-bold mb-4 text-green-400">Module Mastered!</h2>
+                            <p class="mb-4 text-gray-300">Congratulations! You've correctly answered all questions in this module. Your progress will be reset so you can continue to sharpen your knowledge.</p>
+                            <button onclick="resetAndStartGame()" class="w-full bg-purple-700 hover:bg-purple-600 text-white font-bold py-2 px-4 rounded">Play Again</button>
+                        </div>
+                    `;
+                    showModal(masteryContent);
+                    return; 
+                }
+            	
+                questions = shuffleArray(availableQuestions).slice(0, 10);
+                loadQuestion();
+            }
+        }
+
+
+
+
+        function resetAndStartGame() {
+            let correctLog = JSON.parse(localStorage.getItem('correctlyAnsweredQuestions')) || {};
+            correctLog[currentModule] = [];
+            localStorage.setItem('correctlyAnsweredQuestions', JSON.stringify(correctLog));
+            startGame();
+        }
+
+
+
+
+        function returnToMenu() {
+            hideModal();
+            gameScreen.classList.add('hidden');
+            mainMenu.classList.remove('hidden');
+            gameScreen.innerHTML = '';
+            checkGlobalMastery();
+        }
+
+
+
+
+        // --- Multiple Choice Logic ---
+        function loadQuestion() {
+            if (questions.length === 0 || currentQuestionIndex >= questions.length) {
+                showEndGameModal();
+                return;
+            }
+
+
+
+
+            const q = questions[currentQuestionIndex];
+            const options = shuffleArray([q.a, ...q.o]);
+        	
+            gameScreen.innerHTML = `
+                <div class="w-full max-w-3xl">
+                    <div class="flex justify-between items-center mb-2">
+                        <button onclick="returnToMenu()" class="bg-gray-700 hover:bg-gray-600 text-white font-bold py-1 px-3 rounded text-sm">← Menu</button>
+                        <p class="text-right text-gray-400">${currentQuestionIndex + 1} / ${questions.length} | Score: ${score}</p>
+                    </div>
+                    <div class="bg-gray-800 p-8 rounded-lg">
+                        <p class="text-xl md:text-2xl font-medium mb-6">${q.q}</p>
+                        <div class="space-y-4">
+                            ${options.map(option => `
+                                <button class="answer-btn block w-full text-left bg-gray-700 p-4 rounded-lg hover:bg-purple-700 transition-colors duration-200" onclick="checkAnswer('${option.replace(/'/g, "\\'")}')">
+                                    ${option}
+                                </button>
+                            `).join('')}
+                        </div>
+                        <div id="feedback-container" class="mt-6"></div>
+                    </div>
+                </div>
+            `;
+        }
+    	
+        function nextQuestion() {
+            currentQuestionIndex++;
+            loadQuestion();
+        }
+    	
+        function generateAiButtonHtml(question, isCorrect) {
+            if (!question.subjectType || !question.subjectName) {
+                return '';
+            }
+        	
+            let buttonText = isCorrect ? `➡️ Dive Deeper on ${question.subjectName}` : `💡 Learn More about ${question.subjectName}`;
+            if (question.subjectType === 'dish' || question.subjectType === 'wine_pairing') {
+                    buttonText = isCorrect ? `➡️ Explain the Pairing for ${question.subjectName}` : `💡 Learn about Pairing with ${question.subjectName}`;
+            }
+
+
+
+
+            return `<button onclick="handleAiRequest('${question.subjectType}', '${question.subjectName.replace(/'/g, "\\'")}')" class="mt-4 bg-purple-600 hover:bg-purple-500 text-white font-bold py-2 px-4 rounded text-sm">${buttonText}</button>`;
+        }
+
+
+
+
+        function checkAnswer(selectedOption) {
+            const q = questions[currentQuestionIndex];
+            const isCorrect = selectedOption === q.a;
+            const feedbackContainer = document.getElementById('feedback-container');
+        	
+            let feedbackHtml = '';
+            if (isCorrect) {
+                score++;
+                const questionText = q.q;
+                let correctLog = JSON.parse(localStorage.getItem('correctlyAnsweredQuestions')) || {};
+                if (!correctLog[currentModule]) {
+                    correctLog[currentModule] = [];
+                }
+                if (!correctLog[currentModule].includes(questionText)) {
+                    correctLog[currentModule].push(questionText);
+                }
+                localStorage.setItem('correctlyAnsweredQuestions', JSON.stringify(correctLog));
+
+
+
+
+                feedbackHtml = `<div class="p-4 rounded-lg bg-green-900 border border-green-700">
+                                    <p class="font-bold text-green-300">Correct!</p>
+                                    <p class="text-green-400">${q.a}</p>
+                                    ${generateAiButtonHtml(q, true)}
+                                </div>`;
+            } else {
+                feedbackHtml = `<div class="p-4 rounded-lg bg-red-900 border border-red-700">
+                                    <p class="font-bold text-red-300">Incorrect.</p>
+                                    <p class="text-red-400">The correct answer was: ${q.a}</p>
+                                    ${generateAiButtonHtml(q, false)}
+                                </div>`;
+            }
+
+
+
+
+            feedbackContainer.innerHTML = feedbackHtml;
+            document.querySelectorAll('.answer-btn').forEach(btn => {
+                btn.disabled = true;
+                if(btn.innerText === q.a) {
+                    btn.classList.remove('hover:bg-purple-700');
+                    btn.classList.add('bg-green-700');
+                }
+            });
+            feedbackContainer.innerHTML += `<button onclick="nextQuestion()" class="mt-4 w-full bg-purple-700 hover:bg-purple-600 text-white font-bold py-2 px-4 rounded">Continue</button>`;
+        }
+    	
+        // --- Historian's Scroll Logic ---
+        function loadHistorianQuestion() {
+            if (currentQuestionIndex >= questions.length) {
+                showEndGameModal();
+                return;
+            }
+
+
+
+
+            const q = questions[currentQuestionIndex];
+            userTimeline = [];
+        	
+            const eventsWithIds = q.events.map((event, index) => ({ ...event, id: `${currentQuestionIndex}-${index}` }));
+            historianAvailableEvents = shuffleArray(eventsWithIds);
+
+
+
+
+            gameScreen.innerHTML = `
+                <div class="w-full max-w-4xl">
+                    <div class="flex justify-between items-center mb-2">
+                        <button onclick="returnToMenu()" class="bg-gray-700 hover:bg-gray-600 text-white font-bold py-1 px-3 rounded text-sm">← Menu</button>
+                        <p class="text-center text-gray-400">Question ${currentQuestionIndex + 1} / ${questions.length} | Score: ${score}</p>
+                    </div>
+                    <div class="bg-gray-800 p-6 rounded-lg">
+                        <p class="text-xl text-center font-medium mb-6">${q.question}</p>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <div>
+                                <h3 class="font-bold text-lg mb-2 text-purple-400 text-center">Available Events</h3>
+                                <div id="available-events" class="space-y-2">
+                                    ${historianAvailableEvents.map(event => `
+                                        <button data-id="${event.id}" class="timeline-item w-full text-left bg-gray-700 p-3 rounded hover:bg-purple-800 transition-colors duration-200">
+                                            ${event.text}
+                                        </button>
+                                    `).join('')}
+                                </div>
+                            </div>
+                            <div>
+                                <h3 class="font-bold text-lg mb-2 text-purple-400 text-center">Your Timeline (Earliest to Latest)</h3>
+                                <div id="user-timeline" class="space-y-2 bg-gray-900 p-3 rounded-lg min-h-[200px]"></div>
+                            </div>
+                        </div>
+                        <div class="text-center mt-6">
+                            <button id="submit-timeline" class="bg-purple-700 hover:bg-purple-600 text-white font-bold py-3 px-8 rounded-lg" onclick="checkTimeline()">Submit</button>
+                        </div>
+                    </div>
+                </div>
+            `;
+        	
+            document.querySelectorAll('#available-events .timeline-item').forEach(button => {
+                button.addEventListener('click', (e) => {
+                    const eventId = e.currentTarget.dataset.id;
+                    const event = historianAvailableEvents.find(ev => ev.id === eventId);
+                    if (event && !userTimeline.some(e => e.id === event.id)) {
+                        userTimeline.push(event);
+                        e.currentTarget.classList.add('selected', 'opacity-50', 'cursor-not-allowed');
+                        e.currentTarget.disabled = true;
+                        renderUserTimeline();
+                    }
+                });
+            });
+        }
+    	
+        function renderUserTimeline() {
+            const timelineContainer = document.getElementById('user-timeline');
+            timelineContainer.innerHTML = userTimeline.map((event, index) => `
+                <div class="bg-purple-900 p-3 rounded flex items-center justify-between">
+                    <span>${index + 1}. ${event.text}</span>
+                    <button class="text-red-400 hover:text-red-200 font-bold" onclick="removeFromTimeline('${event.id}')">&times;</button>
+                </div>
+            `).join('');
+        }
+
+
+
+
+        function removeFromTimeline(eventId) {
+            const indexToRemove = userTimeline.findIndex(event => event.id === eventId);
+
+
+
+
+            if (indexToRemove > -1) {
+                userTimeline.splice(indexToRemove, 1);
+                const buttonToReEnable = document.querySelector(`#available-events .timeline-item[data-id="${eventId}"]`);
+                if (buttonToReEnable) {
+                    buttonToReEnable.disabled = false;
+                    buttonToReEnable.classList.remove('selected', 'opacity-50', 'cursor-not-allowed');
+                }
+                renderUserTimeline();
+            }
+        }
+
+
+
+
+        function checkTimeline() {
+            const q = questions[currentQuestionIndex];
+            const correctTimeline = [...q.events].sort((a, b) => a.date - b.date);
+            let isCompletelyCorrect = userTimeline.length === correctTimeline.length;
+        	
+            if (isCompletelyCorrect) {
+                for (let i = 0; i < correctTimeline.length; i++) {
+                    if (userTimeline[i].text !== correctTimeline[i].text) {
+                        isCompletelyCorrect = false;
+                        break;
+                    }
+                }
+            }
+        	
+            if(isCompletelyCorrect) {
+                score++;
+            }
+
+
+
+
+            const userTimelineHtml = userTimeline.map((event, i) => {
+                const isEventInCorrectPosition = correctTimeline[i] && correctTimeline[i].text === event.text;
+                const borderColor = isEventInCorrectPosition ? 'border-green-500' : 'border-red-500';
+                return `<li class="p-2 bg-gray-700 rounded border-2 ${borderColor}">${event.text}</li>`;
+            }).join('');
+
+
+
+
+            const correctTimelineHtml = correctTimeline.map(e => 
+                `<li class="p-2 bg-gray-700 rounded border-2 border-green-500">${e.text} <span class="text-gray-400 text-sm">(${e.date})</span></li>`
+            ).join('');
+        	
+            const feedbackContent = `
+                <div class="p-6">
+                    <h2 class="text-2xl font-bold mb-4 ${isCompletelyCorrect ? 'text-green-400' : 'text-yellow-400'}">${isCompletelyCorrect ? 'Perfect!' : 'Review Your Timeline'}</h2>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div>
+                            <h3 class="font-bold text-lg mb-2 text-purple-400">Your Timeline</h3>
+                            <ol class="list-decimal list-inside space-y-2">
+                                ${userTimelineHtml}
+                            </ol>
+                        </div>
+                        <div>
+                            <h3 class="font-bold text-lg mb-2 text-purple-400">Correct Timeline</h3>
+                            <ol class="list-decimal list-inside space-y-2">
+                                ${correctTimelineHtml}
+                            </ol>
+                        </div>
+                    </div>
+                    <button onclick="nextHistorianQuestion()" class="mt-6 w-full bg-purple-700 hover:bg-purple-600 text-white font-bold py-2 px-4 rounded">Continue</button>
+                </div>
+            `;
+            showModal(feedbackContent);
+        }
+
+
+
+
+        function nextHistorianQuestion() {
+            hideModal();
+            currentQuestionIndex++;
+            loadHistorianQuestion();
+        }
+
+
+
+
+        // --- Mastery Logic ---
+        function checkGlobalMastery() {
+            if (sessionStorage.getItem('globalMasteryAcknowledged')) {
+                return;
+            }
+
+
+
+
+            const modulesToMaster = ['terroir', 'ampelographer', 'lawmaker', 'gastronome', 'critic'];
+            const correctLog = JSON.parse(localStorage.getItem('correctlyAnsweredQuestions')) || {};
+        	
+            let allMastered = true;
+            for (const module of modulesToMaster) {
+                const totalQuestions = gameData[module].questions.length;
+                const correctlyAnswered = (correctLog[module] || []).length;
+                if (correctlyAnswered < totalQuestions) {
+                    allMastered = false;
+                    break;
+                }
+            }
+
+
+
+
+            if (allMastered) {
+                showGlobalMasteryModal();
+            }
+        }
+
+
+
+
+        function showGlobalMasteryModal() {
+            const content = `
+                <div class="p-6 text-center">
+                    <h2 class="text-2xl font-bold mb-4 text-purple-400">Congratulations, Wine Master!</h2>
+                    <p class="mb-4 text-gray-300">You have demonstrated exceptional knowledge by correctly answering every question across all core modules. You have truly mastered Argentina!</p>
+                    <p class="mb-6 text-gray-300">To keep your expertise sharp, continue to practice with the <strong>Flashcard Study</strong> decks.</p>
+                    <button onclick="closeGlobalMasteryModal()" class="w-full bg-purple-700 hover:bg-purple-600 text-white font-bold py-2 px-4 rounded">Continue</button>
+                </div>
+            `;
+            showModal(content);
+        }
+
+
+
+
+        function closeGlobalMasteryModal() {
+            sessionStorage.setItem('globalMasteryAcknowledged', 'true');
+            hideModal();
+        }
+
+
+
+
+        // --- Flashcard Logic ---
+        function showFlashcardTopicSelection() {
+            const topics = Object.keys(flashcardData); // Use flashcardData keys
+            const content = `
+                <div class="p-6">
+                    <h2 class="text-2xl font-bold mb-4 text-purple-400">Build Your Flashcard Deck</h2>
+                    <p class="mb-6 text-gray-300">Select the topics you want to study. These decks cover the entire source document.</p>
+                    <div id="flashcard-topics" class="space-y-2 mb-4">
+                        ${topics.map(topic => `
+                            <label class="flex items-center bg-gray-700 p-3 rounded-lg hover:bg-gray-600 cursor-pointer">
+                                <input type="checkbox" class="form-checkbox h-5 w-5 text-purple-600 bg-gray-800 border-gray-600 rounded focus:ring-purple-500" data-topic="${topic}">
+                                <span class="ml-3 text-white">${gameData[topic].title}</span>
+                            </label>
+                        `).join('')}
+                    </div>
+                     <label class="flex items-center bg-gray-700 p-3 rounded-lg hover:bg-gray-600 cursor-pointer mb-6">
+                        <input type="checkbox" id="select-all-topics" class="form-checkbox h-5 w-5 text-purple-600 bg-gray-800 border-gray-600 rounded focus:ring-purple-500">
+                        <span class="ml-3 text-white font-bold">Select All</span>
+                    </label>
+                    <button onclick="startFlashcardSession()" class="w-full bg-purple-700 hover:bg-purple-600 text-white font-bold py-2 px-4 rounded">Start Studying</button>
+                </div>
+            `;
+            showModal(content);
+        	
+            document.getElementById('select-all-topics').addEventListener('change', (e) => {
+                document.querySelectorAll('#flashcard-topics input[type="checkbox"]').forEach(checkbox => {
+                    checkbox.checked = e.target.checked;
+                });
+            });
+        }
+
+
+
+
+        function startFlashcardSession() {
+            flashcardDeck = [];
+            const selectedTopics = Array.from(document.querySelectorAll('#flashcard-topics input:checked')).map(cb => cb.dataset.topic);
+
+
+
+
+            if (selectedTopics.length === 0) {
+                // Using a modal instead of alert()
+                showModal(`<div class="p-6 text-center">
+                    <p class="text-lg text-yellow-400 mb-4">Please select at least one topic.</p>
+                    <button onclick="showFlashcardTopicSelection()" class="w-full bg-purple-700 hover:bg-purple-600 text-white font-bold py-2 px-4 rounded">Go Back</button>
+                </div>`);
+                return;
+            }
+
+
+
+
+            selectedTopics.forEach(topic => {
+                if (flashcardData[topic]) {
+                    flashcardDeck.push(...flashcardData[topic]);
+                }
+            });
+
+
+
+
+            flashcardDeck = shuffleArray(flashcardDeck);
+            currentFlashcardIndex = 0;
+            hideModal();
+            mainMenu.classList.add('hidden');
+            gameScreen.classList.remove('hidden');
+            loadFlashcard();
+        }
+
+
+
+
+        function loadFlashcard() {
+            if (flashcardDeck.length === 0) {
+                gameScreen.innerHTML = `<div class="text-center">
+                    <p class="text-2xl mb-4">No topics selected.</p>
+                    <button onclick="returnToMenu()" class="bg-purple-700 hover:bg-purple-600 text-white font-bold py-2 px-4 rounded">Main Menu</button>
+                </div>`;
+                return;
+            }
+            const card = flashcardDeck[currentFlashcardIndex];
+            gameScreen.innerHTML = `
+                <div class="w-full max-w-2xl flex flex-col items-center">
+                    <p class="text-gray-400 mb-4">${currentFlashcardIndex + 1} / ${flashcardDeck.length}</p>
+                    <div class="flashcard-container w-full h-80 mb-6">
+                        <div class="flashcard" onclick="this.classList.toggle('is-flipped')">
+                            <div class="flashcard-face flashcard-front text-2xl font-semibold text-center">${card.q}</div>
+                            <div class="flashcard-face flashcard-back text-xl text-center overflow-y-auto">${card.a}</div>
+                        </div>
+                    </div>
+                    <div class="flex justify-between w-full">
+                        <button id="prev-card" class="bg-gray-700 hover:bg-gray-600 text-white font-bold py-2 px-6 rounded">&larr; Previous</button>
+                        <button onclick="returnToMenu()" class="bg-red-700 hover:bg-red-600 text-white font-bold py-2 px-6 rounded">End Session</button>
+                        <button id="next-card" class="bg-gray-700 hover:bg-gray-600 text-white font-bold py-2 px-6 rounded">Next &rarr;</button>
+                    </div>
+                </div>
+            `;
+        	
+            document.getElementById('prev-card').addEventListener('click', () => {
+                if (currentFlashcardIndex > 0) {
+                    currentFlashcardIndex--;
+                    loadFlashcard();
+                }
+            });
+            document.getElementById('next-card').addEventListener('click', () => {
+                if (currentFlashcardIndex < flashcardDeck.length - 1) {
+                    currentFlashcardIndex++;
+                    loadFlashcard();
+                }
+            });
+        }
+    	
+        // --- AI Integration ---
+        async function handleAiRequest(subjectType, subjectName) {
+            if (!userApiKey) {
+                showModal(`<div class="p-6 text-center">
+                    <h2 class="text-2xl font-bold mb-4 text-yellow-400">API Key Required</h2>
+                    <p class="mb-4 text-gray-300">Please set your Google AI API key in the 'AI Settings' on the main menu to use this feature.</p>
+                    <button onclick="hideModal()" class="w-full bg-purple-700 hover:bg-purple-600 text-white font-bold py-2 px-4 rounded">Close</button>
+                </div>`);
+                return;
+            }
+
+
+
+
+            let prompt;
+            let title;
+            const region = "Argentina";
+
+
+
+
+            switch (subjectType) {
+                case 'clone':
+                case 'grape':
+                case 'viticulture':
+                    title = `Ampelography Profile: ${subjectName}`;
+                    prompt = `You are a master ampelographer and wine educator with a specialization in ${region}. Your task is to profile the grape, clone, or viticultural topic: ${subjectName}. Your response must follow this strict pyramid of importance: 1. The subject's specific expression and role within ${region}. 2. Its general viticultural characteristics as they manifest in ${region}'s climate. 3. Its history within the region. Your entire response must be framed through the lens of ${region}. Synthesize information from authoritative sources, but always prioritize the context of ${region}. Structure your response with the following sections: Overview and History in ${region}, Viticultural Characteristics in ${region}, and Typical ${region} Wine Profile. Format the output in simple HTML.`;
+                    break;
+                case 'wine':
+                case 'producer':
+                case 'vintage':
+                case 'place':
+                case 'wine_style':
+                    title = `Critic's Focus: ${subjectName}`;
+                    prompt = `You are a world-renowned wine critic specializing exclusively in the wines of ${region}. Your task is to write a professional profile for the following iconic ${region} topic: ${subjectName}. Your analysis must adhere to a strict pyramid of importance: 1) The specific subject's style or character. 2) The character of its specific appellation within ${region}. 3) The general characteristics of ${region}. Do not mention wines from other regions unless making a direct, essential stylistic comparison. Synthesize information from authoritative sources like Vinous, The Wine Advocate, and JancisRobinson.com, but ensure the final note is your own expert synthesis. Format in simple HTML.`;
+                    break;
+                case 'dish':
+                case 'wine_pairing':
+                    title = `Gastronomic Pairing: ${subjectName}`;
+                    prompt = `You are a master sommelier and food theorist specializing in the cuisine and wine of ${region}. Your task is to explain the classic wine pairing for the dish: ${subjectName}. Your explanation must follow this strict pyramid of importance: 1. The specific characteristics of the dish as found in the region. 2. The typical profile of a ${region} wine that pairs with it. 3. The underlying gastronomic principles (complement, contrast, texture) that make the pairing successful within the context of ${region}'s culture. Synthesize information from expert sources, but frame your entire response within the context of ${region}. Format in simple HTML.`;
+                    break;
+                case 'ingredient':
+                case 'gastronomy':
+                    title = `Ingredient Focus: ${subjectName}`;
+                    prompt = `You are a food and wine expert specializing in the cuisine of ${region}. Your task is to provide a detailed overview of the ingredient: ${subjectName}. Your response must follow this strict pyramid of importance: 1. How this ingredient is used in the local cuisine of ${region}. 2. Its typical flavor and aromatic profile. 3. How its profile might be reflected in or complement the local wines, but do not focus on specific pairings unless it is intrinsic to the ingredient itself. Synthesize from authoritative sources. Format in simple HTML.`;
+                    break;
+                case 'beverage':
+                case 'spirit':
+                case 'liqueur':
+                    title = `Beverage Profile: ${subjectName}`;
+                    prompt = `You are an expert on the spirits and beers of South America, with a specialization in ${region}. Your task is to provide a detailed overview of ${subjectName}. Your response must follow this strict pyramid of importance: 1. How ${subjectName} is made and consumed specifically within ${region}. 2. Its key ingredients and typical flavor profile. 3. Its cultural significance in ${region}. Do not focus on wine pairings unless it is a key part of its consumption. Synthesize information from authoritative sources. Format in simple HTML.`;
+                    break;
+                default:
+                    title = `Expert Overview: ${subjectName}`;
+                    prompt = `You are a wine and food expert specializing in ${region}. Provide a concise and informative overview of the following topic: ${subjectName}, ensuring your response is strictly relevant to its context within ${region}. Format in simple HTML.`;
+            }
+        	
+            showModal(`<div class="p-6 text-center">
+                <h2 class="text-2xl font-bold mb-4 text-purple-400">Generating AI Response...</h2>
+                <div class="animate-spin rounded-full h-16 w-16 border-b-2 border-white mx-auto"></div>
+                <p class="mt-4 text-gray-400">Please wait, contacting the master sommelier...</p>
+            </div>`);
+
+
+
+
+            try {
+                const chatHistory = [{ role: "user", parts: [{ text: prompt }] }];
+                const payload = { contents: chatHistory };
+                const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${userApiKey}`;
+            	
+                const response = await fetch(apiUrl, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+
+
+
+
+                if (!response.ok) {
+                    const errorData = await response.json();
+                    throw new Error(errorData.error.message || `API request failed with status ${response.status}`);
+                }
+
+
+
+
+                const result = await response.json();
+            	
+                if (result.candidates && result.candidates[0].content && result.candidates[0].content.parts[0]) {
+                    const text = result.candidates[0].content.parts[0].text;
+                    const aiContent = `
+                        <div class="p-6">
+                            <div class="flex justify-between items-center mb-4">
+                                <h2 class="text-2xl font-bold text-purple-400">${title}</h2>
+                                <button onclick="hideModal()" class="text-gray-400 hover:text-white text-2xl">&times;</button>
+                            </div>
+                            <div class="prose prose-invert prose-purple max-w-none">${text.replace(/\n/g, '<br>')}</div>
+                        </div>`;
+                    showModal(aiContent);
+                } else {
+                     throw new Error("Invalid response structure from API.");
+                }
+
+
+
+
+            } catch (error) {
+                console.error("AI Generation Error:", error);
+                const errorContent = `
+                    <div class="p-6">
+                        <h2 class="text-2xl font-bold mb-4 text-red-400">Error</h2>
+                        <p class="mb-4 text-gray-300">Could not generate AI response. Please check your API key and network connection.</p>
+                        <p class="text-sm text-gray-500 bg-gray-900 p-2 rounded">${error.message}</p>
+                        <button onclick="hideModal()" class="mt-4 w-full bg-purple-700 hover:bg-purple-600 text-white font-bold py-2 px-4 rounded">Close</button>
+                    </div>`;
+                showModal(errorContent);
+            }
+        }
+
+
+
+
+        // --- Utility Functions ---
+        function shuffleArray(array) {
+            for (let i = array.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [array[i], array[j]] = [array[j], array[i]];
+            }
+            return array;
+        }
+
+
+
+
+        // --- Initial Load ---
+        window.onload = showWelcomeModal;
+
+
+
+
+    </script>
+</body>
+</html>
